@@ -54,7 +54,7 @@ function DoughnutChart({ theme, dbData, title }) {
     cutout: "55%",
     plugins: {
       datalabels: {
-        color: "#fff",
+        color: theme.palette.text.primary,
         formatter: (value) => `${value}%`,
         font: {
           weight: "regular",
@@ -67,6 +67,7 @@ function DoughnutChart({ theme, dbData, title }) {
         labels: {
           usePointStyle: true,
           padding: 16,
+          color: theme.palette.text.primary,
         },
       },
       tooltip: {

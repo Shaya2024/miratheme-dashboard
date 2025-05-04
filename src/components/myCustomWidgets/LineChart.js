@@ -120,6 +120,9 @@ function LineChart({ theme, dbData, title }) {
       },
       legend: {
         display: false,
+        labels: {
+          color: theme.palette.text.primary,
+        },
       },
     },
     scales: {
@@ -128,12 +131,18 @@ function LineChart({ theme, dbData, title }) {
         grid: {
           color: "rgba(0,0,0,0.0)",
         },
+        ticks: {
+          color: theme.palette.text.primary,
+        },
       },
       y: {
         id: "y",
         grid: {
           color: "rgba(0,0,0,0.0375)",
           fontColor: "#fff",
+        },
+        ticks: {
+          color: theme.palette.text.primary,
         },
       },
     },

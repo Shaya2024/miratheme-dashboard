@@ -52,7 +52,7 @@ const BarChart = ({ theme, dbData, title }) => {
       categories: categories,
       labels: {
         style: {
-          colors: "#444",
+          colors: theme.palette.text.primary,
         },
       },
       max: Math.max(...dbData.map((f) => f.totalAverage)) * 0.85,
@@ -60,7 +60,7 @@ const BarChart = ({ theme, dbData, title }) => {
     yaxis: {
       labels: {
         style: {
-          colors: "#444",
+          colors: theme.palette.text.primary,
           fontWeight: "bold",
         },
         formatter: (facilityLabel) => {
@@ -83,6 +83,9 @@ const BarChart = ({ theme, dbData, title }) => {
     legend: {
       position: "bottom",
       horizontalAlign: "center",
+      labels: {
+        colors: theme.palette.text.primary,
+      },
     },
     colors: payors.map((payor) => {
       const payorColors = {
