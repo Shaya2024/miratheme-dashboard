@@ -7,11 +7,10 @@ import { Doughnut } from "react-chartjs-2";
 import { CardContent, Card as MuiCard, Typography } from "@mui/material";
 import { orange, red } from "@mui/material/colors";
 import { spacing } from "@mui/system";
-import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import ChartDataLabels from "chartjs-plugin-datalabels";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
-
 
 const Card = styled(MuiCard)(spacing);
 
@@ -22,7 +21,6 @@ const ChartWrapper = styled.div`
 `;
 
 function DoughnutChart({ theme, dbData, title }) {
- 
   const payorColors = {
     "Medicare A": theme.palette.warning.main,
     Medicaid: theme.palette.primary.main,
@@ -32,7 +30,6 @@ function DoughnutChart({ theme, dbData, title }) {
   };
   const labels = dbData.map((d) => d.payer);
   const percentages = dbData.map((d) => d.averagePercentage);
-
 
   const data = {
     labels: labels,
@@ -52,21 +49,21 @@ function DoughnutChart({ theme, dbData, title }) {
     cutout: "55%",
     plugins: {
       datalabels: {
-      color: "#fff",
-      formatter: (value) => `${value}%`,
-      font: {
-        weight: 'regular',
-        size: 14,
-      }
-    },
-    legend: {
-      display: true,
-      position: 'bottom',
-      labels: {
-        usePointStyle: true,
-        padding: 16,
+        color: "#fff",
+        formatter: (value) => `${value}%`,
+        font: {
+          weight: "regular",
+          size: 14,
+        },
       },
-    },
+      legend: {
+        display: true,
+        position: "bottom",
+        labels: {
+          usePointStyle: true,
+          padding: 16,
+        },
+      },
       tooltip: {
         callbacks: {
           label: (context) => {
@@ -87,7 +84,6 @@ function DoughnutChart({ theme, dbData, title }) {
         <Typography variant="h6" gutterBottom>
           {title}
         </Typography>
-      
 
         <Spacer mb={6} />
 

@@ -21,15 +21,15 @@ const ChartWrapper = styled.div`
 `;
 
 const BarChart = ({ theme, dbData, title }) => {
-
-  const payors = Array.from(new Set(dbData.flatMap((f) => Object.keys(f.payors))));
+  const payors = Array.from(
+    new Set(dbData.flatMap((f) => Object.keys(f.payors)))
+  );
   const categories = dbData.map((f) => f.facility);
 
   const series = payors.map((payor) => ({
     name: payor,
     data: dbData.map((f) => f.payors[payor] || 0),
   }));
-
 
   const options = {
     chart: {
@@ -52,29 +52,28 @@ const BarChart = ({ theme, dbData, title }) => {
       categories: categories,
       labels: {
         style: {
-          colors: '#444'
+          colors: "#444",
         },
       },
     },
     yaxis: {
       labels: {
         style: {
-          colors: '#444',
-          fontWeight: 'bold'
+          colors: "#444",
+          fontWeight: "bold",
         },
         formatter: (facilityLabel) => {
           const matched = dbData.find((f) => f.facility === facilityLabel);
-          const total = matched?.totalAverage ?? 'N/A';
+          const total = matched?.totalAverage ?? "N/A";
           return [facilityLabel, `Total: ${total}`];
-        }
-      }
+        },
+      },
     },
     tooltip: {
       y: {
         shared: true,
         intersect: false,
         formatter: (val) => `${val}`, // Only show the value for that segment
-        
       },
     },
     fill: {
@@ -83,20 +82,19 @@ const BarChart = ({ theme, dbData, title }) => {
     legend: {
       position: "bottom",
       horizontalAlign: "center",
-    
     },
     colors: payors.map((payor) => {
       const payorColors = {
         Medicaid: theme.palette.primary.main,
         Private: theme.palette.success.main,
         HMO: theme.palette.warning.main,
-        'Medicare A': theme.palette.info.main,
+        "Medicare A": theme.palette.info.main,
         VA: theme.palette.error.main,
         Paid_Bed: theme.palette.info.main,
         Unpaid_Bed: theme.palette.info.main,
-        'Medicaid Pending': theme.palette.info.main,
+        "Medicaid Pending": theme.palette.info.main,
       };
-      return payorColors[payor] || '#ccc';
+      return payorColors[payor] || "#ccc";
     }),
   };
 
@@ -104,10 +102,10 @@ const BarChart = ({ theme, dbData, title }) => {
     <Card mb={1}>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-        {title}
+          {title}
         </Typography>
 
-        <Spacer mb={.1} />
+        <Spacer mb={0.1} />
 
         <ChartWrapper>
           <Chart options={options} series={series} type="bar" height="350" />

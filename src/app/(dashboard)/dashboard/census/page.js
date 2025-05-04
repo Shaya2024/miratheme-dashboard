@@ -5,7 +5,6 @@ import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 
-
 import {
   Grid,
   Divider as MuiDivider,
@@ -25,22 +24,19 @@ const Divider = styled(MuiDivider)(spacing);
 
 const Typography = styled(MuiTypography)(spacing);
 
-
-
 function CensusDashboard() {
-
   const today = new Date();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(today.getDate() - 30);
 
-  const formatDate = (d) => d.toISOString().split('T')[0];
+  const formatDate = (d) => d.toISOString().split("T")[0];
 
   const [filters, setFilters] = useState({
     startDate: formatDate(thirtyDaysAgo),
     endDate: formatDate(today),
     state: [],
     facility: [],
-    status: ['Active'],
+    status: ["Active"],
     payors: [],
     splitMedicaidPending: false,
   });
@@ -49,67 +45,64 @@ function CensusDashboard() {
 
   const barChartData = [
     {
-      facility: 'Gallatine Manor',
-      payors: { 'Medicare A': 25, 'HMO': 45, 'Medicaid': 10, 'Private': 5 },
-      totalAverage: 100
+      facility: "Gallatine Manor",
+      payors: { "Medicare A": 25, HMO: 45, Medicaid: 10, Private: 5 },
+      totalAverage: 100,
     },
     {
-      facility: 'Agawam',
-      payors: { 'Medicare A': 10, 'HMO': 20, 'Medicaid': 5, 'Private': 10 },
-      totalAverage: 45
+      facility: "Agawam",
+      payors: { "Medicare A": 10, HMO: 20, Medicaid: 5, Private: 10 },
+      totalAverage: 45,
     },
     {
-      facility: 'Springfield',
-      payors: { 'Medicare A': 15, 'HMO': 30, 'Medicaid': 10, 'Private': 5 },
-      totalAverage: 60
-    }
-  ]
+      facility: "Springfield",
+      payors: { "Medicare A": 15, HMO: 30, Medicaid: 10, Private: 5 },
+      totalAverage: 60,
+    },
+  ];
 
   const doughnutChartData = [
     {
-      payer: 'Medicare A',
+      payer: "Medicare A",
       averagePercentage: 40,
-      averageCount: 120
+      averageCount: 120,
     },
 
     {
-      payer: 'Medicaid',
+      payer: "Medicaid",
       averagePercentage: 35,
-      averageCount: 105
+      averageCount: 105,
     },
 
     {
-      payer: 'HMO',
+      payer: "HMO",
       averagePercentage: 25,
-      averageCount: 75
+      averageCount: 75,
     },
     {
-      payer: 'Private',
+      payer: "Private",
       averagePercentage: 10,
-      averageCount: 30
+      averageCount: 30,
     },
     {
-      payer: 'VA',
+      payer: "VA",
       averagePercentage: 5,
-      averageCount: 15
+      averageCount: 15,
     },
-  
-  ]
+  ];
 
   const trendData = [
-    { Date: '2024-04-01', Count: 1358 },
-    { Date: '2024-04-02', Count: 1348 },
-    { Date: '2024-04-03', Count: 1352 },
-    { Date: '2024-04-04', Count: 1341 },
-    { Date: '2024-04-05', Count: 1347 },
-    { Date: '2024-04-06', Count: 1341 },
-    { Date: '2024-04-07', Count: 1337 },
-    { Date: '2024-04-08', Count: 1341 },
-    { Date: '2024-04-09', Count: 1357 },
-    { Date: '2024-04-10', Count: 1341 },
-
-  ]
-
+    { Date: "2024-04-01", Count: 1358 },
+    { Date: "2024-04-02", Count: 1348 },
+    { Date: "2024-04-03", Count: 1352 },
+    { Date: "2024-04-04", Count: 1341 },
+    { Date: "2024-04-05", Count: 1347 },
+    { Date: "2024-04-06", Count: 1341 },
+    { Date: "2024-04-07", Count: 1337 },
+    { Date: "2024-04-08", Count: 1341 },
+    { Date: "2024-04-09", Count: 1357 },
+    { Date: "2024-04-10", Count: 1341 },
+  ];
 
   useEffect(() => {
     fetch("/api/census/getAverageCensus")
@@ -133,14 +126,10 @@ function CensusDashboard() {
           </Typography>
         </Grid>
 
-
-
         <Grid>
           <Actions />
         </Grid>
       </Grid>
-
-
 
       <Grid container spacing={6}>
         <Grid
@@ -151,21 +140,14 @@ function CensusDashboard() {
         >
           <FilterBar filters={filters} setFilters={setFilters} />
         </Grid>
-
       </Grid>
 
       <Divider my={6} />
 
-
-
       <Grid container spacing={6}>
-
-
         {/* Left Column */}
         <Grid item size={{ xs: 12, lg: 6 }}>
           <Grid container spacing={3}>
-
-
             <Grid item size={{ xs: 6 }} sx={{ minHeight: 170 }}>
               <Stats
                 title="Average Census"
@@ -175,7 +157,6 @@ function CensusDashboard() {
                 percentagecolor={green[500]}
               />
             </Grid>
-
 
             <Grid item size={{ xs: 6 }} sx={{ minHeight: 170 }}>
               <Stats
@@ -187,39 +168,31 @@ function CensusDashboard() {
               />
             </Grid>
 
-
             <Grid item size={{ xs: 12 }} sx={{ minHeight: 340 }}>
-              <DoughnutChart dbData={doughnutChartData} title="Payor Distribution" />
+              <DoughnutChart
+                dbData={doughnutChartData}
+                title="Payor Distribution"
+              />
             </Grid>
-
-
           </Grid>
         </Grid>
-
-
 
         {/* Right Column */}
         <Grid item size={{ xs: 12, lg: 6 }}>
           <Grid container direction="column" spacing={6}>
-
-
             <Grid item size={{ xs: 12 }} sx={{ minHeight: 340 }}>
               <LineChart dbData={trendData} title="Census Trend" />
             </Grid>
 
-
             <Grid item size={{ xs: 12 }} sx={{ minHeight: 300 }}>
-              <BarChart dbData={barChartData} title="Average Daily Census by Payor" />
+              <BarChart
+                dbData={barChartData}
+                title="Average Daily Census by Payor"
+              />
             </Grid>
-
-
           </Grid>
         </Grid>
-
-
       </Grid>
-
-
     </React.Fragment>
   );
 }

@@ -16,7 +16,7 @@ import { alpha } from "@mui/material/styles";
 
 // Crosshair vertical line plugin
 const verticalLinePlugin = {
-  id: 'verticalLine',
+  id: "verticalLine",
   afterDraw: (chart) => {
     if (chart.tooltip?._active?.length) {
       const ctx = chart.ctx;
@@ -24,7 +24,9 @@ const verticalLinePlugin = {
       const x = activePoint.element.x;
 
       // ✅ Use a dynamic way to get the Y scale
-      const yScale = Object.values(chart.scales).find(scale => scale.axis === 'y');
+      const yScale = Object.values(chart.scales).find(
+        (scale) => scale.axis === "y"
+      );
       if (!yScale) return;
 
       const topY = yScale.top;
@@ -36,13 +38,12 @@ const verticalLinePlugin = {
       ctx.lineTo(x, bottomY);
       ctx.lineWidth = 0.5;
       ctx.setLineDash([4, 4]);
-      ctx.strokeStyle = '#aaa';
+      ctx.strokeStyle = "#aaa";
       ctx.stroke();
       ctx.restore();
     }
   },
 };
-
 
 import {
   Chart as ChartJS,
@@ -53,7 +54,7 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
+} from "chart.js";
 
 // REGISTER Chart.js modules + the vertical line plugin
 ChartJS.register(
@@ -67,27 +68,24 @@ ChartJS.register(
   verticalLinePlugin // 👈 register this plugin
 );
 
-
 const Card = styled(MuiCard)(spacing);
 
 const ChartWrapper = styled.div`
   height: 280px;
 `;
 
-
 function LineChart({ theme, dbData, title }) {
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
   const data = {
-    labels: dbData.map(d => formatDate(d.Date)),
+    labels: dbData.map((d) => formatDate(d.Date)),
     datasets: [
       {
         label: title,
@@ -108,7 +106,7 @@ function LineChart({ theme, dbData, title }) {
         },
         borderColor: theme.palette.secondary.main,
         tension: 0.4,
-        data: dbData.map(d => d.Count),
+        data: dbData.map((d) => d.Count),
       },
     ],
   };
@@ -117,8 +115,8 @@ function LineChart({ theme, dbData, title }) {
     maintainAspectRatio: false,
     plugins: {
       tooltip: {
-        mode: "index",           // <-- triggers tooltip for all datasets at the same x
-        intersect: false,        // <-- allows hover even when not on a point
+        mode: "index", // <-- triggers tooltip for all datasets at the same x
+        intersect: false, // <-- allows hover even when not on a point
       },
       legend: {
         display: false,
@@ -126,13 +124,13 @@ function LineChart({ theme, dbData, title }) {
     },
     scales: {
       x: {
-        id: 'x',
+        id: "x",
         grid: {
           color: "rgba(0,0,0,0.0)",
         },
       },
       y: {
-        id: 'y',
+        id: "y",
         grid: {
           color: "rgba(0,0,0,0.0375)",
           fontColor: "#fff",
