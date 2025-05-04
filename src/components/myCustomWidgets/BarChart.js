@@ -31,7 +31,6 @@ const BarChart = ({ theme, dbData, title }) => {
     data: dbData.map((f) => f.payors[payor] || 0),
   }));
 
-
   const options = {
     chart: {
       stacked: true,
@@ -56,7 +55,7 @@ const BarChart = ({ theme, dbData, title }) => {
           colors: "#444",
         },
       },
-      max: Math.max(...dbData.map((f) => f.totalAverage))*.85,
+      max: Math.max(...dbData.map((f) => f.totalAverage)) * 0.85,
     },
     yaxis: {
       labels: {
