@@ -196,7 +196,6 @@ function CensusDashboard() {
           </Grid>
         </Grid>
       </Grid>
-      <Cards />
     </React.Fragment>
   );
 }
