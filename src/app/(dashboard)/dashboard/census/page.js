@@ -1,0 +1,227 @@
+"use client";
+
+import React from "react";
+import styled from "@emotion/styled";
+import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
+
+
+import {
+  Grid,
+  Divider as MuiDivider,
+  Typography as MuiTypography,
+} from "@mui/material";
+import { spacing } from "@mui/system";
+import { green, red } from "@mui/material/colors";
+
+import Actions from "@/components/pages/dashboard/default/Actions";
+import LineChart from "@/components/myCustomWidgets/LineChart";
+import DoughnutChart from "@/components/myCustomWidgets/DoughnutChart";
+import Stats from "@/components/myCustomWidgets/Stats";
+import BarChart from "@/components/myCustomWidgets/BarChart";
+import FilterBar from "@/components/myCustomWidgets/filterBar";
+
+const Divider = styled(MuiDivider)(spacing);
+
+const Typography = styled(MuiTypography)(spacing);
+
+
+
+function CensusDashboard() {
+
+  const today = new Date();
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+
+  const formatDate = (d) => d.toISOString().split('T')[0];
+
+  const [filters, setFilters] = useState({
+    startDate: formatDate(thirtyDaysAgo),
+    endDate: formatDate(today),
+    state: [],
+    facility: [],
+    status: ['Active'],
+    payors: [],
+    splitMedicaidPending: false,
+  });
+  const { t } = useTranslation();
+  const [averageCensus, setAverageCensus] = useState(null);
+
+  const barChartData = [
+    {
+      facility: 'Gallatine Manor',
+      payors: { 'Medicare A': 25, 'HMO': 45, 'Medicaid': 10, 'Private': 5 },
+      totalAverage: 100
+    },
+    {
+      facility: 'Agawam',
+      payors: { 'Medicare A': 10, 'HMO': 20, 'Medicaid': 5, 'Private': 10 },
+      totalAverage: 45
+    },
+    {
+      facility: 'Springfield',
+      payors: { 'Medicare A': 15, 'HMO': 30, 'Medicaid': 10, 'Private': 5 },
+      totalAverage: 60
+    }
+  ]
+
+  const doughnutChartData = [
+    {
+      payer: 'Medicare A',
+      averagePercentage: 40,
+      averageCount: 120
+    },
+
+    {
+      payer: 'Medicaid',
+      averagePercentage: 35,
+      averageCount: 105
+    },
+
+    {
+      payer: 'HMO',
+      averagePercentage: 25,
+      averageCount: 75
+    },
+    {
+      payer: 'Private',
+      averagePercentage: 10,
+      averageCount: 30
+    },
+    {
+      payer: 'VA',
+      averagePercentage: 5,
+      averageCount: 15
+    },
+  
+  ]
+
+  const trendData = [
+    { Date: '2024-04-01', Count: 1358 },
+    { Date: '2024-04-02', Count: 1348 },
+    { Date: '2024-04-03', Count: 1352 },
+    { Date: '2024-04-04', Count: 1341 },
+    { Date: '2024-04-05', Count: 1347 },
+    { Date: '2024-04-06', Count: 1341 },
+    { Date: '2024-04-07', Count: 1337 },
+    { Date: '2024-04-08', Count: 1341 },
+    { Date: '2024-04-09', Count: 1357 },
+    { Date: '2024-04-10', Count: 1341 },
+
+  ]
+
+
+  useEffect(() => {
+    fetch("/api/census/getAverageCensus")
+      .then((res) => res.json())
+      .then((data) => setAverageCensus(data.averageCensus))
+      .catch((err) => console.error("Failed to load average census", err));
+  }, []);
+
+  return (
+    <React.Fragment>
+      <Grid justifyContent="space-between" container spacing={6}>
+        <Grid>
+          <Typography variant="h3" gutterBottom>
+            Census Dashboard
+          </Typography>
+          <Typography variant="subtitle1">
+            {t("Welcome back")}, Lucy! {t("We've missed you")}.{" "}
+            <span role="img" aria-label="Waving Hand Sign">
+              👋
+            </span>
+          </Typography>
+        </Grid>
+
+
+
+        <Grid>
+          <Actions />
+        </Grid>
+      </Grid>
+
+
+
+      <Grid container spacing={6}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 12,
+          }}
+        >
+          <FilterBar filters={filters} setFilters={setFilters} />
+        </Grid>
+
+      </Grid>
+
+      <Divider my={6} />
+
+
+
+      <Grid container spacing={6}>
+
+
+        {/* Left Column */}
+        <Grid item size={{ xs: 12, lg: 6 }}>
+          <Grid container spacing={3}>
+
+
+            <Grid item size={{ xs: 6 }} sx={{ minHeight: 170 }}>
+              <Stats
+                title="Average Census"
+                amount="89"
+                chip="Postgres"
+                percentagetext="+26%"
+                percentagecolor={green[500]}
+              />
+            </Grid>
+
+
+            <Grid item size={{ xs: 6 }} sx={{ minHeight: 170 }}>
+              <Stats
+                title="Total Occupancy %"
+                amount="79%"
+                chip="Annual"
+                percentagetext="-14%"
+                percentagecolor={red[500]}
+              />
+            </Grid>
+
+
+            <Grid item size={{ xs: 12 }} sx={{ minHeight: 340 }}>
+              <DoughnutChart dbData={doughnutChartData} title="Payor Distribution" />
+            </Grid>
+
+
+          </Grid>
+        </Grid>
+
+
+
+        {/* Right Column */}
+        <Grid item size={{ xs: 12, lg: 6 }}>
+          <Grid container direction="column" spacing={6}>
+
+
+            <Grid item size={{ xs: 12 }} sx={{ minHeight: 340 }}>
+              <LineChart dbData={trendData} title="Census Trend" />
+            </Grid>
+
+
+            <Grid item size={{ xs: 12 }} sx={{ minHeight: 300 }}>
+              <BarChart dbData={barChartData} title="Average Daily Census by Payor" />
+            </Grid>
+
+
+          </Grid>
+        </Grid>
+
+
+      </Grid>
+
+
+    </React.Fragment>
+  );
+}
+
+export default CensusDashboard;
