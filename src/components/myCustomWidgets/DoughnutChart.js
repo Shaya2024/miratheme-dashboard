@@ -12,12 +12,17 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
-const Card = styled(MuiCard)(spacing);
+const Card = styled(MuiCard)(spacing, {
+  height: '100%',
+  margin: '0 auto'
+});
 
 const Spacer = styled.div(spacing);
 
 const ChartWrapper = styled.div`
-  height: 300px;
+  height: 500px;
+  width: 100%;
+  margin: 0 auto;
 `;
 
 function DoughnutChart({ theme, dbData, title }) {

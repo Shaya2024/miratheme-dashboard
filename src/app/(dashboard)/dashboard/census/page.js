@@ -20,6 +20,9 @@ import Stats from "@/components/myCustomWidgets/Stats";
 import BarChart from "@/components/myCustomWidgets/BarChart";
 import FilterBar from "@/components/myCustomWidgets/filterBar";
 
+import Cards from "../../components/cards/page";
+import components from "@/theme/components";
+
 const Divider = styled(MuiDivider)(spacing);
 
 const Typography = styled(MuiTypography)(spacing);
@@ -152,7 +155,7 @@ function CensusDashboard() {
               <Stats
                 title="Average Census"
                 amount="89"
-                chip="Postgres"
+                chip="placeholder"
                 percentagetext="+26%"
                 percentagecolor={green[500]}
               />
@@ -162,7 +165,7 @@ function CensusDashboard() {
               <Stats
                 title="Total Occupancy %"
                 amount="79%"
-                chip="Annual"
+                chip="placeholder"
                 percentagetext="-14%"
                 percentagecolor={red[500]}
               />
@@ -193,6 +196,7 @@ function CensusDashboard() {
           </Grid>
         </Grid>
       </Grid>
+      <Cards />
     </React.Fragment>
   );
 }
