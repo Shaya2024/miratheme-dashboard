@@ -20,26 +20,26 @@ const pagesSection = [
   {
     href: "/dashboard",
     icon: Sliders,
-    title: "Dashboard",
+    title: "Dashboard 1",
     children: [
       {
-        href: "/dashboard/default",
-        title: "Default",
+        href: "/dashboard/census",
+        title: "Census",
       },
       {
         href: "/dashboard/analytics",
-        title: "Analytics",
+        title: "Staffing",
       },
       {
         href: "/dashboard/saas",
-        title: "SaaS",
+        title: "PDPM",
       },
     ],
   },
   {
     href: "/pages",
     icon: Layout,
-    title: "Pages",
+    title: "Dashboard 2",
     children: [
       {
         href: "/pages/profile",
@@ -66,7 +66,7 @@ const pagesSection = [
   {
     href: "/projects",
     icon: Briefcase,
-    title: "Projects",
+    title: "Dashboard 3",
     badge: "8",
   },
   {
@@ -320,7 +320,7 @@ const docsSection = [
 
 const navItems = [
   {
-    title: "Pages",
+    title: "Dashboards",
     pages: pagesSection,
   },
   {

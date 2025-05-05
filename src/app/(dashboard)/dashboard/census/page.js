@@ -149,7 +149,7 @@ function CensusDashboard() {
 
       <Grid container spacing={6}>
         {/* Left Column */}
-        <Grid item size={{ xs: 12, lg: 6 }}>
+        <Grid item size={{ xs: 12, lg: 4 }}>
           <Grid container spacing={3}>
             <Grid item size={{ xs: 6 }} sx={{ minHeight: 170 }}>
               <Stats
@@ -181,7 +181,7 @@ function CensusDashboard() {
         </Grid>
 
         {/* Right Column */}
-        <Grid item size={{ xs: 12, lg: 6 }}>
+        <Grid item size={{ xs: 12, lg: 8 }}>
           <Grid container direction="column" spacing={6}>
             <Grid item size={{ xs: 12 }} sx={{ minHeight: 340 }}>
               <LineChart dbData={trendData} title="Census Trend" />
