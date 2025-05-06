@@ -33,6 +33,7 @@ function CensusDashboard() {
   thirtyDaysAgo.setDate(today.getDate() - 30);
 
   const formatDate = (d) => d.toISOString().split("T")[0];
+  const [averageCensus, setAverageCensus] = useState(null);
 
   const [filters, setFilters] = useState({
     startDate: formatDate(thirtyDaysAgo),
@@ -43,8 +44,35 @@ function CensusDashboard() {
     payors: [],
     splitMedicaidPending: false,
   });
+
+  const queryString = new URLSearchParams({
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    state: filters.state.join(","), // turn array into CSV
+    facility: filters.facility.join(","),
+    status: filters.status.join(","),
+    splitMedicaidPending: filters.splitMedicaidPending,
+  }).toString();
+
+  useEffect(() => {
+    fetch(`/api/census/getAverageCensus?${queryString}`)
+      .then((res) => res.json())
+      .then((data) => setAverageCensus(data.averageCensus))
+      .catch((err) => console.error("Failed to load average census", err));
+  }, [filters]);
+
+  useEffect(() => {
+    fetch(`/api/census/getAverageCensus?${queryString}`)
+      .then((res) => res.json())
+      .then((data) => setAverageCensus(data.averageCensus))
+      .catch((err) => console.error("Failed to load average census", err));
+  }, [filters]);
+
+  console.log(`averageCensus: ${averageCensus}`);
+  console.log(`startDate: ${filters.startDate}`);
+  console.log(`endDate: ${filters.endDate}`);
+
   const { t } = useTranslation();
-  const [averageCensus, setAverageCensus] = useState(null);
 
   const barChartData = [
     {
@@ -107,13 +135,6 @@ function CensusDashboard() {
     { Date: "2024-04-10", Count: 1341 },
   ];
 
-  useEffect(() => {
-    fetch("/api/census/getAverageCensus")
-      .then((res) => res.json())
-      .then((data) => setAverageCensus(data.averageCensus))
-      .catch((err) => console.error("Failed to load average census", err));
-  }, []);
-
   return (
     <React.Fragment>
       <Grid justifyContent="space-between" container spacing={6}>
@@ -145,55 +166,66 @@ function CensusDashboard() {
         </Grid>
       </Grid>
 
-      <Divider my={6} />
+      <Divider my={3} />
 
-      <Grid container spacing={6}>
+      <Grid container spacing={3}>
         {/* Left Column */}
-        <Grid item size={{ xs: 12, lg: 4 }}>
-          <Grid container spacing={3}>
-            <Grid item size={{ xs: 6 }} sx={{ minHeight: 170 }}>
-              <Stats
-                title="Average Census"
-                amount="89"
-                chip="placeholder"
-                percentagetext="+26%"
-                percentagecolor={green[500]}
-              />
+        <Grid
+          item
+          size={{ xs: 12, lg: 4 }}
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+        >
+          {/* Stats section */}
+          <div>
+            <Grid container spacing={3}>
+              <Grid item size={{ xs: 6 }}>
+                <Stats
+                  title="Average Census"
+                  amount={averageCensus}
+                  chip="placeholder"
+                  percentagetext="+26%"
+                  percentagecolor={green[500]}
+                />
+              </Grid>
+              <Grid item size={{ xs: 6 }}>
+                <Stats
+                  title="Total Occupancy %"
+                  amount="79%"
+                  chip="placeholder"
+                  percentagetext="-14%"
+                  percentagecolor={red[500]}
+                />
+              </Grid>
             </Grid>
+          </div>
 
-            <Grid item size={{ xs: 6 }} sx={{ minHeight: 170 }}>
-              <Stats
-                title="Total Occupancy %"
-                amount="79%"
-                chip="placeholder"
-                percentagetext="-14%"
-                percentagecolor={red[500]}
-              />
-            </Grid>
-
-            <Grid item size={{ xs: 12 }} sx={{ minHeight: 340 }}>
-              <DoughnutChart
-                dbData={doughnutChartData}
-                title="Payor Distribution"
-              />
-            </Grid>
-          </Grid>
+          {/* Doughnut Chart section */}
+          <div style={{ height: "100%" }}>
+            <DoughnutChart
+              dbData={doughnutChartData}
+              title="Payor Distribution"
+            />
+          </div>
         </Grid>
 
         {/* Right Column */}
-        <Grid item size={{ xs: 12, lg: 8 }}>
-          <Grid container direction="column" spacing={6}>
-            <Grid item size={{ xs: 12 }} sx={{ minHeight: 340 }}>
-              <LineChart dbData={trendData} title="Census Trend" />
-            </Grid>
+        <Grid
+          item
+          size={{ xs: 12, lg: 8 }}
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+        >
+          {/* Line Chart */}
+          <div>
+            <LineChart dbData={trendData} title="Census Trend" />
+          </div>
 
-            <Grid item size={{ xs: 12 }} sx={{ minHeight: 300 }}>
-              <BarChart
-                dbData={barChartData}
-                title="Average Daily Census by Payor"
-              />
-            </Grid>
-          </Grid>
+          {/* Bar Chart */}
+          <div>
+            <BarChart
+              dbData={barChartData}
+              title="Average Daily Census by Payor"
+            />
+          </div>
         </Grid>
       </Grid>
     </React.Fragment>

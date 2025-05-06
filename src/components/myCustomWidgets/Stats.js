@@ -21,11 +21,9 @@ const illustrationCardStyle = (props) => css`
     color: ${props.theme.palette.primary.main};
   `}
 `;
-
 const Card = styled(MuiCard)`
   position: relative;
-  margin-bottom: ${(props) => props.theme.spacing(6)};
-
+  margin-bottom: 0;
   ${illustrationCardStyle}
 `;
 

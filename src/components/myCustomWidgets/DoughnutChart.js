@@ -14,14 +14,14 @@ ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 const Card = styled(MuiCard)(spacing, {
   height: "100%",
+  width: "100%",
   margin: "0 auto",
 });
 
 const Spacer = styled.div(spacing);
 
 const ChartWrapper = styled.div`
-  height: 500px;
-  width: 100%;
+  min-height: 400px;
   margin: 0 auto;
 `;
 

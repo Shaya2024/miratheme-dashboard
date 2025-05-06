@@ -11,13 +11,14 @@ const Chart = dynamic(() => import("@/vendor/react-apexcharts"), {
   ssr: false,
 });
 
-const Card = styled(MuiCard)(spacing);
+const Card = styled(MuiCard)(spacing, {});
 
 const Spacer = styled.div(spacing);
 
 const ChartWrapper = styled.div`
-  height: 350px;
+  height: 500;
   width: 100%;
+  margin: 0 auto;
 `;
 
 const BarChart = ({ theme, dbData, title }) => {

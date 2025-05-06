@@ -71,7 +71,7 @@ ChartJS.register(
 const Card = styled(MuiCard)(spacing);
 
 const ChartWrapper = styled.div`
-  height: 280px;
+  height: 100%;
 `;
 
 function LineChart({ theme, dbData, title }) {
@@ -149,7 +149,7 @@ function LineChart({ theme, dbData, title }) {
   };
 
   return (
-    <Card mb={6}>
+    <Card mb={0}>
       <CardHeader
         action={
           <IconButton aria-label="settings" size="large">
