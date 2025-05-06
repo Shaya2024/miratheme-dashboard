@@ -106,6 +106,7 @@ function LineChart({ theme, dbData, title }) {
         },
         borderColor: theme.palette.secondary.main,
         tension: 0.4,
+        pointRadius: 4,
         data: dbData.map((d) => d.Count),
       },
     ],
@@ -123,6 +124,9 @@ function LineChart({ theme, dbData, title }) {
         labels: {
           color: theme.palette.text.primary,
         },
+      },
+      datalabels: {
+        display: false,
       },
     },
     scales: {

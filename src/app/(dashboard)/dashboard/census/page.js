@@ -34,6 +34,11 @@ function CensusDashboard() {
 
   const formatDate = (d) => d.toISOString().split("T")[0];
   const [averageCensus, setAverageCensus] = useState(null);
+  const [totalOccupancy, setTotalOccupancy] = useState(null);
+  const [payorDistribution, setPayorDistribution] = useState(null);
+  const [trendData, setTrendData] = useState(null);
+  const [barChartData, setBarChartData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const [filters, setFilters] = useState({
     startDate: formatDate(thirtyDaysAgo),
@@ -51,21 +56,65 @@ function CensusDashboard() {
     state: filters.state.join(","), // turn array into CSV
     facility: filters.facility.join(","),
     status: filters.status.join(","),
-    splitMedicaidPending: filters.splitMedicaidPending,
+    splitMedicaidPending: filters.splitMedicaidPending.toString(),
   }).toString();
 
   useEffect(() => {
-    fetch(`/api/census/getAverageCensus?${queryString}`)
-      .then((res) => res.json())
-      .then((data) => setAverageCensus(data.averageCensus))
-      .catch((err) => console.error("Failed to load average census", err));
-  }, [filters]);
+    const fetchAverageCensus = async () => {
+      fetch(`/api/census/getAverageCensus?${queryString}`)
+        .then((res) => res.json())
+        .then((data) => setAverageCensus(data.averageCensus))
+        .catch((err) => console.error("Failed to load average census", err));
+    };
 
-  useEffect(() => {
-    fetch(`/api/census/getAverageCensus?${queryString}`)
-      .then((res) => res.json())
-      .then((data) => setAverageCensus(data.averageCensus))
-      .catch((err) => console.error("Failed to load average census", err));
+    const fetchTotalOccupancy = async () => {
+      fetch(`/api/census/getTotalOccupancy?${queryString}`)
+        .then((res) => res.json())
+        .then((data) => setTotalOccupancy(data.totalOccupancy))
+        .catch((err) => console.error("Failed to load total occupancy", err));
+    };
+
+    const fetchPayorDistribution = async () => {
+      fetch(`/api/census/getPayorDistribution?${queryString}`)
+        .then((res) => res.json())
+        .then((data) => setPayorDistribution(data.payorDistribution))
+        .catch((err) =>
+          console.error("Failed to load payor distribution", err)
+        );
+    };
+
+    const fetchTrendData = async () => {
+      fetch(`/api/census/getTrendData?${queryString}`)
+        .then((res) => res.json())
+        .then((data) => setTrendData(data.trendData))
+        .catch((err) => console.error("Failed to load trend data", err));
+    };
+
+    const fetchBarChartData = async () => {
+      fetch(`/api/census/getBarChartData?${queryString}`)
+        .then((res) => res.json())
+        .then((data) => setBarChartData(data.barChartData))
+        .catch((err) => console.error("Failed to load bar chart data", err));
+    };
+
+    const fetchAll = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([
+          fetchAverageCensus(),
+          fetchTotalOccupancy(),
+          fetchPayorDistribution(),
+          fetchTrendData(),
+          fetchBarChartData(),
+        ]);
+      } catch (err) {
+        console.error("Error fetching dashboard data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAll();
   }, [filters]);
 
   console.log(`averageCensus: ${averageCensus}`);
@@ -74,7 +123,7 @@ function CensusDashboard() {
 
   const { t } = useTranslation();
 
-  const barChartData = [
+  const mockBarChartData = [
     {
       facility: "Gallatine Manor",
       payors: { "Medicare A": 25, HMO: 45, Medicaid: 10, Private: 5 },
@@ -92,7 +141,7 @@ function CensusDashboard() {
     },
   ];
 
-  const doughnutChartData = [
+  const mockDoughnutChartData = [
     {
       payer: "Medicare A",
       averagePercentage: 40,
@@ -122,7 +171,7 @@ function CensusDashboard() {
     },
   ];
 
-  const trendData = [
+  const mockTrendData = [
     { Date: "2024-04-01", Count: 1358 },
     { Date: "2024-04-02", Count: 1348 },
     { Date: "2024-04-03", Count: 1352 },
@@ -202,7 +251,7 @@ function CensusDashboard() {
           {/* Doughnut Chart section */}
           <div style={{ height: "100%" }}>
             <DoughnutChart
-              dbData={doughnutChartData}
+              dbData={mockDoughnutChartData}
               title="Payor Distribution"
             />
           </div>
@@ -216,13 +265,13 @@ function CensusDashboard() {
         >
           {/* Line Chart */}
           <div>
-            <LineChart dbData={trendData} title="Census Trend" />
+            <LineChart dbData={mockTrendData} title="Census Trend" />
           </div>
 
           {/* Bar Chart */}
           <div>
             <BarChart
-              dbData={barChartData}
+              dbData={mockBarChartData}
               title="Average Daily Census by Payor"
             />
           </div>
