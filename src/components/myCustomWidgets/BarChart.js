@@ -1,106 +1,123 @@
-// Originally from components/pages/charts/apexcharts/BarChart
+// components/pages/charts/chartjs/BarChart.js
+"use client";
+
 import React from "react";
 import styled from "@emotion/styled";
 import { withTheme } from "@emotion/react";
-import dynamic from "next/dynamic";
+import { Bar } from "react-chartjs-2";
+import { Card as MuiCard, CardContent, Typography } from "@mui/material";
+import { orange, red, purple, yellow, teal } from "@mui/material/colors";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
-import { CardContent, Card as MuiCard, Typography } from "@mui/material";
-import { fontWeight, spacing } from "@mui/system";
+import { spacing } from "@mui/system";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
-const Chart = dynamic(() => import("@/vendor/react-apexcharts"), {
-  ssr: false,
-});
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend,
+  ChartDataLabels
+);
 
-const Card = styled(MuiCard)(spacing, {});
-
-const Spacer = styled.div(spacing);
-
+const Card = styled(MuiCard)(spacing);
 const ChartWrapper = styled.div`
-  height: 500;
+  height: 350px;
   width: 100%;
-  margin: 0 auto;
 `;
 
-const BarChart = ({ theme, dbData, title }) => {
+function BarChart({ theme, dbData, title }) {
   const payors = Array.from(
     new Set(dbData.flatMap((f) => Object.keys(f.payors)))
   );
   const categories = dbData.map((f) => f.facility);
 
-  const series = payors.map((payor) => ({
-    name: payor,
-    data: dbData.map((f) => f.payors[payor] || 0),
-  }));
+  const payorColors = {
+    Medicaid: theme.palette.primary.dark,
+    Private: teal[500],
+    HMO: orange[500],
+    "Medicare A": theme.palette.secondary.light,
+    VA: red[500],
+    Paid_Bed: theme.palette.grey[300],
+    Unpaid_Bed: purple[300],
+    "Medicaid Pending": yellow[500],
+  };
+
+  const chartData = {
+    labels: categories,
+    datasets: payors.map((payor) => ({
+      label: payor,
+      data: dbData.map((f) => f.payors[payor] || 0),
+      backgroundColor: payorColors[payor] || "#ccc",
+      borderWidth: 1,
+    })),
+  };
 
   const options = {
-    chart: {
-      stacked: true,
-      toolbar: {
-        show: false,
-      },
-    },
-    plotOptions: {
-      bar: {
-        horizontal: true,
-        distributed: false,
-      },
-    },
-    stroke: {
-      width: 1,
-      colors: ["#fff"],
-    },
-    xaxis: {
-      categories: categories,
-      labels: {
-        style: {
-          colors: theme.palette.text.primary,
+    indexAxis: "y",
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        stacked: true,
+        ticks: {
+          color: theme.palette.text.primary,
+        },
+        grid: {
+          color: "rgba(0,0,0,0.1)",
         },
       },
-      max: Math.max(...dbData.map((f) => f.totalAverage)) * 0.85,
-    },
-    yaxis: {
-      labels: {
-        style: {
-          colors: theme.palette.text.primary,
-          fontWeight: "bold",
-        },
-        formatter: (facilityLabel) => {
-          const matched = dbData.find((f) => f.facility === facilityLabel);
-          const total = matched?.totalAverage ?? "N/A";
-          return [facilityLabel, `Total: ${total}`];
-        },
-      },
-    },
-    tooltip: {
       y: {
-        shared: true,
-        intersect: false,
-        formatter: (val) => `${val}`, // Only show the value for that segment
+        stacked: true,
+        ticks: {
+          color: theme.palette.text.primary,
+          callback: function (value, index) {
+            const label = categories[index];
+            const total = dbData[index].totalAverage ?? ""; // assumes you have totalAverage in dbData
+            return [`${label}`, `Total: ${total}`]; // Multi-line label
+          },
+        },
+        grid: {
+          color: "rgba(0,0,0,0.05)",
+        },
       },
     },
-    fill: {
-      opacity: 1,
-    },
-    legend: {
-      position: "bottom",
-      horizontalAlign: "center",
-      labels: {
-        colors: theme.palette.text.primary,
+    plugins: {
+      legend: {
+        position: "bottom",
+        labels: {
+          color: theme.palette.text.primary,
+          usePointStyle: true,
+          pointStyle: "rect",
+          padding: 20,
+        },
+      },
+      tooltip: {
+        enabled: true,
+        mode: "nearest",
+        intersect: true,
+      },
+      datalabels: {
+        color: "#ffffff",
+        font: {
+          weight: "regular",
+          size: 12,
+        },
+        formatter: function (value) {
+          return value > 0 ? value : "";
+        },
+        anchor: "center",
+        align: "center",
       },
     },
-    colors: payors.map((payor) => {
-      const payorColors = {
-        Medicaid: theme.palette.primary.main,
-        Private: theme.palette.success.main,
-        HMO: theme.palette.warning.main,
-        "Medicare A": theme.palette.info.main,
-        VA: theme.palette.error.main,
-        Paid_Bed: theme.palette.info.main,
-        Unpaid_Bed: theme.palette.info.main,
-        "Medicaid Pending": theme.palette.info.main,
-      };
-      return payorColors[payor] || "#ccc";
-    }),
   };
 
   return (
@@ -109,15 +126,12 @@ const BarChart = ({ theme, dbData, title }) => {
         <Typography variant="h6" gutterBottom>
           {title}
         </Typography>
-
-        <Spacer mb={0.1} />
-
         <ChartWrapper>
-          <Chart options={options} series={series} type="bar" height="350" />
+          <Bar data={chartData} options={options} />
         </ChartWrapper>
       </CardContent>
     </Card>
   );
-};
+}
 
 export default withTheme(BarChart);

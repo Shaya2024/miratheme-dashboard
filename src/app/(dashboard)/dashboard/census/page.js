@@ -13,7 +13,7 @@ import {
 import { spacing } from "@mui/system";
 import { green, red } from "@mui/material/colors";
 
-import Actions from "@/components/pages/dashboard/default/Actions";
+import Actions from "@/components/myCustomWidgets/Actions";
 import LineChart from "@/components/myCustomWidgets/LineChart";
 import DoughnutChart from "@/components/myCustomWidgets/DoughnutChart";
 import Stats from "@/components/myCustomWidgets/Stats";
@@ -38,6 +38,12 @@ function CensusDashboard() {
   const [payorDistribution, setPayorDistribution] = useState(null);
   const [trendData, setTrendData] = useState(null);
   const [barChartData, setBarChartData] = useState(null);
+  const [stateOptions, setStateOptions] = useState(["MA", "CT", "RI"]);
+  const [facilityOptions, setFacilityOptions] = useState([
+    "Gallatine Manor",
+    "Agawam",
+    "Springfield",
+  ]);
   const [loading, setLoading] = useState(false);
 
   const [filters, setFilters] = useState({
@@ -58,6 +64,15 @@ function CensusDashboard() {
     status: filters.status.join(","),
     splitMedicaidPending: filters.splitMedicaidPending.toString(),
   }).toString();
+
+  useEffect(() => {
+    fetch(`/api/census/getAverageCensus?${queryString}`)
+      .then((res) => res.json())
+      .then((data) => setAverageCensus(data.averageCensus))
+      .catch((err) => console.error("Failed to load average census", err));
+  }, [filters]);
+
+  /*
 
   useEffect(() => {
     const fetchAverageCensus = async () => {
@@ -116,7 +131,7 @@ function CensusDashboard() {
 
     fetchAll();
   }, [filters]);
-
+*/
   console.log(`averageCensus: ${averageCensus}`);
   console.log(`startDate: ${filters.startDate}`);
   console.log(`endDate: ${filters.endDate}`);
@@ -149,15 +164,14 @@ function CensusDashboard() {
     },
 
     {
-      payer: "Medicaid",
-      averagePercentage: 35,
-      averageCount: 105,
-    },
-
-    {
       payer: "HMO",
       averagePercentage: 25,
       averageCount: 75,
+    },
+    {
+      payer: "Medicaid",
+      averagePercentage: 35,
+      averageCount: 105,
     },
     {
       payer: "Private",
@@ -200,10 +214,14 @@ function CensusDashboard() {
         </Grid>
 
         <Grid>
-          <Actions />
+          <Actions
+            filters={filters}
+            setFilters={setFilters}
+            stateOptions={stateOptions}
+            facilityOptions={facilityOptions}
+          />
         </Grid>
       </Grid>
-
       <Grid container spacing={6}>
         <Grid
           size={{

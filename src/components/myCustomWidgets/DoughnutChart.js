@@ -5,7 +5,7 @@ import { withTheme } from "@emotion/react";
 import { Doughnut } from "react-chartjs-2";
 
 import { CardContent, Card as MuiCard, Typography } from "@mui/material";
-import { orange, red } from "@mui/material/colors";
+import { orange, red, purple, yellow, teal } from "@mui/material/colors";
 import { spacing } from "@mui/system";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
@@ -27,11 +27,14 @@ const ChartWrapper = styled.div`
 
 function DoughnutChart({ theme, dbData, title }) {
   const payorColors = {
-    "Medicare A": theme.palette.warning.main,
-    Medicaid: theme.palette.primary.main,
-    HMO: theme.palette.success.main,
-    Private: theme.palette.secondary.main,
-    VA: theme.palette.info.main,
+    Medicaid: theme.palette.primary.dark,
+    Private: teal[500],
+    HMO: orange[500],
+    "Medicare A": theme.palette.secondary.light,
+    VA: red[500],
+    Paid_Bed: theme.palette.grey[300],
+    Unpaid_Bed: purple[300],
+    "Medicaid Pending": yellow[500],
   };
   const labels = dbData.map((d) => d.payer);
   const percentages = dbData.map((d) => d.averagePercentage);
@@ -54,7 +57,7 @@ function DoughnutChart({ theme, dbData, title }) {
     cutout: "55%",
     plugins: {
       datalabels: {
-        color: theme.palette.text.primary,
+        color: "#ffffff",
         formatter: (value) => `${value}%`,
         font: {
           weight: "regular",

@@ -21,7 +21,7 @@ export async function GET(req) {
       searchParams.get("splitMedicaidPending") === "true";
 
     // Adjust this to your actual stored procedure or query
-    const result = await pool.query("SELECT cnt FROM testCensusFunc($1, $2)", [
+    const result = await pool.query("SELECT cnt from testCensus2($1, $2)", [
       startDate,
       endDate,
     ]);
