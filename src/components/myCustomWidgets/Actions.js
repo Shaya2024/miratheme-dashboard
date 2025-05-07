@@ -1,12 +1,14 @@
 import React from "react";
 import styled from "@emotion/styled";
 import { Calendar } from "lucide-react";
+import CustomDatePicker from "./CustomDatePicker";
 
 import {
+  Popover,
   Button as MuiButton,
   FormControlLabel,
   Switch,
-  Menu,
+  MenuItem,
   OutlinedInput,
   CardContent,
   Checkbox,
@@ -21,14 +23,14 @@ import {
   InputLabel,
   Link,
   ListItemText,
-  MenuItem,
   Breadcrumbs as MuiBreadcrumbs,
   Card as MuiCard,
-  Divider as MuiDivider,
+  Divider,
   FormControl as MuiFormControl,
   Paper as MuiPaper,
   Select,
   Typography,
+  Box,
 } from "@mui/material";
 
 import {
@@ -113,7 +115,6 @@ function Actions({
 
   const handleChange = (field) => (event) => {
     const value = event.target.value;
-
     setFilters((prev) => ({
       ...prev,
       [field]: value.includes("All") ? [] : value,
@@ -122,7 +123,7 @@ function Actions({
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const handleClick = (event) => {
+  const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -130,61 +131,59 @@ function Actions({
     setAnchorEl(null);
   };
 
+  const open = Boolean(anchorEl);
+
+  const handlePreset = (days) => {
+    const today = new Date();
+    const startDate = new Date();
+    startDate.setDate(today.getDate() - days);
+    setFilters((prev) => ({
+      ...prev,
+      startDate: startDate.toISOString(),
+      endDate: today.toISOString(),
+    }));
+    handleClose();
+  };
+
   return (
     <React.Fragment>
       <Grid container spacing={2}>
-        {/*
-        ////
-        */}
         <Grid item>
-          <Button
-            variant="contained"
-            color="secondary"
-            aria-owns={anchorEl ? "simple-menu" : undefined}
-            aria-haspopup="true"
-            onClick={handleClick}
-          >
-            <Calendar />
-          </Button>
-
-          <Menu
-            id="simple-menu"
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-          >
-            <MenuItem onClick={handleClose}>Today</MenuItem>
-            <MenuItem onClick={handleClose}>Yesterday</MenuItem>
-            <MenuItem onClick={handleClose}>Last 7 days</MenuItem>
-            <MenuItem onClick={handleClose}>Last 30 days</MenuItem>
-            <MenuItem onClick={handleClose}>This month</MenuItem>
-            <MenuItem onClick={handleClose}>Last month</MenuItem>
-          </Menu>
+          <CustomDatePicker
+            value={{
+              startDate: filters.startDate,
+              endDate: filters.endDate,
+            }}
+            onChange={({ startDate, endDate }) =>
+              setFilters((prev) => ({
+                ...prev,
+                startDate,
+                endDate,
+              }))
+            }
+          />
         </Grid>
 
         <Grid item>
-          <Button
-            variant="contained"
-            color="secondary"
-            aria-owns={anchorEl ? "simple-menu" : undefined}
-            aria-haspopup="true"
-            onClick={handleClick}
-          >
-            Today: April 29
-          </Button>
-          <Menu
-            id="simple-menu"
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-          >
-            <MenuItem onClick={handleClose}>Today</MenuItem>
-            <MenuItem onClick={handleClose}>Yesterday</MenuItem>
-            <MenuItem onClick={handleClose}>Last 7 days</MenuItem>
-            <MenuItem onClick={handleClose}>Last 30 days</MenuItem>
-            <MenuItem onClick={handleClose}>This month</MenuItem>
-            <MenuItem onClick={handleClose}>Last month</MenuItem>
-          </Menu>
+          <FormControl sx={{ minWidth: 148 }}>
+            <StyledSelect
+              multiple
+              displayEmpty
+              value={filters.facility}
+              onChange={handleChange("facility")}
+              renderValue={(selected) =>
+                selected.length > 0 ? selected.join(", ") : "Facility"
+              }
+              MenuProps={MenuProps}
+            >
+              {facilityOptions.map((facility) => (
+                <MenuItem key={facility} value={facility}>
+                  <Checkbox checked={filters.facility.includes(facility)} />
+                  <ListItemText primary={facility} />
+                </MenuItem>
+              ))}
+            </StyledSelect>
+          </FormControl>
         </Grid>
 
         <Grid item>
@@ -280,10 +279,6 @@ function Actions({
             <LoopIcon />
           </SmallButton>
         </Grid>
-
-        {/*
-       ////
-        */}
       </Grid>
     </React.Fragment>
   );
