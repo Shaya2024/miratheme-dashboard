@@ -55,7 +55,7 @@ function CensusDashboard() {
     facility: "All",
     residentStatusPaid: 0,
     residentStatusUnpaid: 0,
-    payors: ["All"],
+    payors: [],
     splitMedicaidPending: 0,
   });
 
@@ -110,6 +110,10 @@ function CensusDashboard() {
       .then((res) => res.json())
       .then((data) => setBarChartData(data.barChartData))
       .catch((err) => console.error("Failed to load bar chart data", err));
+  }, [filters]);
+
+  useEffect(() => {
+    console.log(`filters: ${JSON.stringify(filters)}`);
   }, [filters]);
 
   /*
