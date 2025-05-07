@@ -4,6 +4,8 @@ import { Calendar } from "lucide-react";
 
 import {
   Button as MuiButton,
+  FormControlLabel,
+  Switch,
   Menu,
   OutlinedInput,
   CardContent,
@@ -54,6 +56,19 @@ const SmallButton = styled(Button)`
     height: 0.9em;
   }
 `;
+
+const StyledCheckboxLabel = styled(FormControlLabel)(({ theme }) => ({
+  margin: 0,
+  padding: "4px 8px",
+  borderRadius: 4,
+  height: 36,
+  ".MuiCheckbox-root": {
+    padding: 4,
+  },
+  ".MuiTypography-root": {
+    fontSize: "0.875rem",
+  },
+}));
 
 const StyledSelect = styled(Select)(({ theme }) => ({
   backgroundColor: theme.palette.secondary.main,
@@ -118,59 +133,33 @@ function Actions({
   return (
     <React.Fragment>
       <Grid container spacing={2}>
+        {/*
+        ////
+        */}
         <Grid item>
-          <SmallButton size="small" mr={2}>
-            <LoopIcon />
-          </SmallButton>
-        </Grid>
-        <Grid item>
-          <SmallButton size="small" mr={2}>
-            <FilterListIcon />
-          </SmallButton>
-        </Grid>
+          <Button
+            variant="contained"
+            color="secondary"
+            aria-owns={anchorEl ? "simple-menu" : undefined}
+            aria-haspopup="true"
+            onClick={handleClick}
+          >
+            <Calendar />
+          </Button>
 
-        <Grid item>
-          <FormControl sx={{ minWidth: 148 }}>
-            <StyledSelect
-              multiple
-              displayEmpty
-              value={filters.facility}
-              onChange={handleChange("facility")}
-              renderValue={(selected) =>
-                selected.length > 0 ? selected.join(", ") : "Facility"
-              }
-              MenuProps={MenuProps}
-            >
-              {facilityOptions.map((facility) => (
-                <MenuItem key={facility} value={facility}>
-                  <Checkbox checked={filters.facility.includes(facility)} />
-                  <ListItemText primary={facility} />
-                </MenuItem>
-              ))}
-            </StyledSelect>
-          </FormControl>
-        </Grid>
-
-        <Grid item>
-          <FormControl sx={{ minWidth: 148 }}>
-            <StyledSelect
-              multiple
-              displayEmpty
-              value={filters.state}
-              onChange={handleChange("state")}
-              renderValue={(selected) =>
-                selected.length > 0 ? selected.join(", ") : "State"
-              }
-              MenuProps={MenuProps}
-            >
-              {stateOptions.map((state) => (
-                <MenuItem key={state} value={state}>
-                  <Checkbox checked={filters.state.includes(state)} />
-                  <ListItemText primary={state} />
-                </MenuItem>
-              ))}
-            </StyledSelect>
-          </FormControl>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleClose}>Today</MenuItem>
+            <MenuItem onClick={handleClose}>Yesterday</MenuItem>
+            <MenuItem onClick={handleClose}>Last 7 days</MenuItem>
+            <MenuItem onClick={handleClose}>Last 30 days</MenuItem>
+            <MenuItem onClick={handleClose}>This month</MenuItem>
+            <MenuItem onClick={handleClose}>Last month</MenuItem>
+          </Menu>
         </Grid>
 
         <Grid item>
@@ -197,31 +186,104 @@ function Actions({
             <MenuItem onClick={handleClose}>Last month</MenuItem>
           </Menu>
         </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            color="secondary"
-            aria-owns={anchorEl ? "simple-menu" : undefined}
-            aria-haspopup="true"
-            onClick={handleClick}
-          >
-            <Calendar />
-          </Button>
 
-          <Menu
-            id="simple-menu"
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-          >
-            <MenuItem onClick={handleClose}>Today</MenuItem>
-            <MenuItem onClick={handleClose}>Yesterday</MenuItem>
-            <MenuItem onClick={handleClose}>Last 7 days</MenuItem>
-            <MenuItem onClick={handleClose}>Last 30 days</MenuItem>
-            <MenuItem onClick={handleClose}>This month</MenuItem>
-            <MenuItem onClick={handleClose}>Last month</MenuItem>
-          </Menu>
+        <Grid item>
+          <FormControl sx={{ minWidth: 148 }}>
+            <StyledSelect
+              multiple
+              displayEmpty
+              value={filters.state}
+              onChange={handleChange("state")}
+              renderValue={(selected) =>
+                selected.length > 0 ? selected.join(", ") : "State"
+              }
+              MenuProps={MenuProps}
+            >
+              {stateOptions.map((state) => (
+                <MenuItem key={state} value={state}>
+                  <Checkbox checked={filters.state.includes(state)} />
+                  <ListItemText primary={state} />
+                </MenuItem>
+              ))}
+            </StyledSelect>
+          </FormControl>
         </Grid>
+
+        <Grid
+          item
+          sx={(theme) => ({
+            height: 36,
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            border: `1px solid ${theme.palette.secondary.main}`,
+            borderRadius: 1,
+            padding: "0 8px",
+          })}
+        >
+          <Typography sx={{ fontSize: "0.875rem" }}>Status:</Typography>
+          <StyledCheckboxLabel
+            control={
+              <Checkbox
+                checked={filters.status.includes("Paid")}
+                onChange={(e) => {
+                  const newStatus = e.target.checked
+                    ? [...filters.status, "Paid", "Active"]
+                    : filters.status.filter((s) => s !== "Paid");
+                  setFilters((prev) => ({ ...prev, status: newStatus }));
+                }}
+              />
+            }
+            label="Paid"
+          />
+          <StyledCheckboxLabel
+            control={
+              <Checkbox
+                checked={filters.status.includes("Unpaid")}
+                onChange={(e) => {
+                  const newStatus = e.target.checked
+                    ? [...filters.status, "Unpaid", "Active"]
+                    : filters.status.filter((s) => s !== "Unpaid");
+                  setFilters((prev) => ({ ...prev, status: newStatus }));
+                }}
+              />
+            }
+            label="Unpaid"
+          />
+        </Grid>
+
+        <Grid item>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={filters.splitMedicaidPending}
+                onChange={() =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    splitMedicaidPending: !prev.splitMedicaidPending,
+                  }))
+                }
+              />
+            }
+            label="Split Medicaid Pending"
+          />
+        </Grid>
+
+        <Grid item>
+          <SmallButton size="small" mr={2}>
+            <FilterListIcon />
+          </SmallButton>
+        </Grid>
+
+        <Grid item>
+          <SmallButton size="small" mr={2}>
+            <LoopIcon />
+          </SmallButton>
+        </Grid>
+
+        {/*
+       ////
+        */}
       </Grid>
     </React.Fragment>
   );

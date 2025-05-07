@@ -6,9 +6,7 @@ import styled from "@emotion/styled";
 import { withTheme } from "@emotion/react";
 import { Bar } from "react-chartjs-2";
 import { Card as MuiCard, CardContent, Typography } from "@mui/material";
-import { orange, red, purple, yellow, teal } from "@mui/material/colors";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-
 import { spacing } from "@mui/system";
 import {
   Chart as ChartJS,
@@ -18,6 +16,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { getPayorColors } from "@/components/MyCustomUtils/colorPalette";
 
 ChartJS.register(
   CategoryScale,
@@ -40,16 +39,11 @@ function BarChart({ theme, dbData, title }) {
   );
   const categories = dbData.map((f) => f.facility);
 
-  const payorColors = {
-    Medicaid: theme.palette.primary.dark,
-    Private: teal[500],
-    HMO: orange[500],
-    "Medicare A": theme.palette.secondary.light,
-    VA: red[500],
-    Paid_Bed: theme.palette.grey[300],
-    Unpaid_Bed: purple[300],
-    "Medicaid Pending": yellow[500],
-  };
+  const colorPalette = getPayorColors(theme);
+  const payorColors = {};
+  payors.forEach((payor, index) => {
+    payorColors[payor] = colorPalette[index % colorPalette.length];
+  });
 
   const chartData = {
     labels: categories,

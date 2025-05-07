@@ -1,5 +1,14 @@
 import merge from "deepmerge";
-import { green, grey, indigo, red } from "@mui/material/colors";
+import {
+  green,
+  grey,
+  indigo,
+  red,
+  orange,
+  yellow,
+  purple,
+  teal,
+} from "@mui/material/colors";
 import { THEMES } from "@/constants";
 
 const customBlue = {
@@ -26,6 +35,36 @@ const defaultVariant = {
     secondary: {
       main: customBlue[500],
       contrastText: "#FFF",
+    },
+    purple: {
+      main: purple[500],
+      light: purple[300],
+      dark: purple[700],
+      contrastText: "#fff",
+    },
+    red: {
+      main: red[500],
+      light: red[300],
+      dark: red[700],
+      contrastText: "#fff",
+    },
+    orange: {
+      main: orange[500],
+      light: orange[300],
+      dark: orange[700],
+      contrastText: "#fff",
+    },
+    yellow: {
+      main: yellow[600],
+      light: yellow[300],
+      dark: yellow[800],
+      contrastText: "#000", // white-on-yellow is hard to read
+    },
+    teal: {
+      main: teal[500],
+      light: teal[300],
+      dark: teal[700],
+      contrastText: "#fff",
     },
     background: {
       default: "#F7F9FC",

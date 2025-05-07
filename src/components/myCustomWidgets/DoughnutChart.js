@@ -1,14 +1,14 @@
 // Originally from components/pages/charts/chartjs/DoughnutChart
-import React from "react";
+import React, { useRef } from "react";
 import styled from "@emotion/styled";
 import { withTheme } from "@emotion/react";
-import { Doughnut } from "react-chartjs-2";
+import { Doughnut, getElementAtEvent } from "react-chartjs-2";
 
 import { CardContent, Card as MuiCard, Typography } from "@mui/material";
-import { orange, red, purple, yellow, teal } from "@mui/material/colors";
 import { spacing } from "@mui/system";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { getPayorColors } from "@/components/MyCustomUtils/colorPalette";
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
@@ -25,28 +25,26 @@ const ChartWrapper = styled.div`
   margin: 0 auto;
 `;
 
-function DoughnutChart({ theme, dbData, title }) {
-  const payorColors = {
-    Medicaid: theme.palette.primary.dark,
-    Private: teal[500],
-    HMO: orange[500],
-    "Medicare A": theme.palette.secondary.light,
-    VA: red[500],
-    Paid_Bed: theme.palette.grey[300],
-    Unpaid_Bed: purple[300],
-    "Medicaid Pending": yellow[500],
-  };
+function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
+  const chartRef = useRef();
+
+  const colorPalette = getPayorColors(theme);
+
   const labels = dbData.map((d) => d.payer);
   const percentages = dbData.map((d) => d.averagePercentage);
+
+  const backgroundColor = labels.map((payer, index) =>
+    selected.length === 0 || selected.includes(payer)
+      ? colorPalette[index % colorPalette.length]
+      : "#ddd"
+  );
 
   const data = {
     labels: labels,
     datasets: [
       {
         data: percentages,
-        backgroundColor: labels.map(
-          (payer) => payorColors[payer] || theme.palette.grey[300]
-        ),
+        backgroundColor,
         borderColor: "transparent",
       },
     ],
@@ -87,6 +85,24 @@ function DoughnutChart({ theme, dbData, title }) {
     },
   };
 
+  const handleClick = (event) => {
+    const elements = getElementAtEvent(chartRef.current, event);
+    if (!elements.length) return;
+
+    const idx = elements[0].index;
+    const clickedPayor = data.labels[idx];
+
+    if (onSelectPayor) {
+      if (selected.includes(clickedPayor)) {
+        // remove
+        onSelectPayor(selected.filter((p) => p !== clickedPayor));
+      } else {
+        // add
+        onSelectPayor([...selected, clickedPayor]);
+      }
+    }
+  };
+
   return (
     <Card mb={1}>
       <CardContent>
@@ -97,7 +113,12 @@ function DoughnutChart({ theme, dbData, title }) {
         <Spacer mb={6} />
 
         <ChartWrapper>
-          <Doughnut data={data} options={options} />
+          <Doughnut
+            ref={chartRef}
+            data={data}
+            options={options}
+            onClick={handleClick}
+          />
         </ChartWrapper>
       </CardContent>
     </Card>

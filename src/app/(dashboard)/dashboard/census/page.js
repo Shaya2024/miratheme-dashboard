@@ -59,11 +59,15 @@ function CensusDashboard() {
   const queryString = new URLSearchParams({
     startDate: filters.startDate,
     endDate: filters.endDate,
-    state: filters.state.join(","), // turn array into CSV
     facility: filters.facility.join(","),
     status: filters.status.join(","),
+    payors: filters.payors.join(","),
     splitMedicaidPending: filters.splitMedicaidPending.toString(),
+    state: filters.state.join(","),
   }).toString();
+
+  console.log(`queryString: ${queryString}`);
+  console.log(`filters: ${filters.status}`);
 
   useEffect(() => {
     fetch(`/api/census/getAverageCensus?${queryString}`)
@@ -222,8 +226,8 @@ function CensusDashboard() {
           />
         </Grid>
       </Grid>
-      <Grid container spacing={6}>
-        <Grid
+      {/*<Grid container spacing={6}>
+         <Grid
           size={{
             xs: 12,
             md: 12,
@@ -231,7 +235,7 @@ function CensusDashboard() {
         >
           <FilterBar filters={filters} setFilters={setFilters} />
         </Grid>
-      </Grid>
+      </Grid>*/}
 
       <Divider my={3} />
 
@@ -271,6 +275,13 @@ function CensusDashboard() {
             <DoughnutChart
               dbData={mockDoughnutChartData}
               title="Payor Distribution"
+              selected={filters.payors}
+              onSelectPayor={(newPayors) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  payors: newPayors,
+                }))
+              }
             />
           </div>
         </Grid>

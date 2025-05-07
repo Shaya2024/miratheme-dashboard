@@ -17,6 +17,8 @@ export async function GET(req) {
     const state = searchParams.get("state")?.split(",") || [];
     const facility = searchParams.get("facility")?.split(",") || [];
     const status = searchParams.get("status")?.split(",") || [];
+    console.log(`state: ${state}`);
+    console.log(`status: ${status}`);
     const splitMedicaidPending =
       searchParams.get("splitMedicaidPending") === "true";
 
