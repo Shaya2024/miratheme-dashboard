@@ -164,13 +164,6 @@ const FilterBar = ({
 }) => {
   const theme = useTheme();
 
-  // Add this to see all available theme colors
-  useEffect(() => {
-    console.log("Theme Colors:", {
-      palette: theme.palette,
-    });
-  }, [theme]);
-
   // Convert string dates to Date objects for react-datepicker
   const [startDate, setStartDate] = useState(
     filters.startDate ? new Date(filters.startDate) : null

@@ -99,8 +99,8 @@ const StyledSelect = styled(Select)(({ theme }) => ({
 function Actions({
   filters,
   setFilters,
-  facilityOptions = [],
-  stateOptions = [],
+  facilityOptions = ["All"],
+  stateOptions = ["All"],
 }) {
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
@@ -113,11 +113,20 @@ function Actions({
     },
   };
 
-  const handleChange = (field) => (event) => {
+  /* For multiselect 
+    const handleChange = (field) => (event) => {
     const value = event.target.value;
     setFilters((prev) => ({
       ...prev,
       [field]: value.includes("All") ? [] : value,
+    }));
+  };
+  */
+
+  const handleChange = (field) => (event) => {
+    setFilters((prev) => ({
+      ...prev,
+      [field]: event.target.value,
     }));
   };
 
@@ -167,6 +176,31 @@ function Actions({
         <Grid item>
           <FormControl sx={{ minWidth: 148 }}>
             <StyledSelect
+              displayEmpty
+              value={filters.facility}
+              onChange={handleChange("facility")}
+              renderValue={(selected) =>
+                !selected || selected === "All"
+                  ? "Facility"
+                  : selected.length > 3
+                  ? selected.slice(0, 13) + "…"
+                  : selected
+              }
+              MenuProps={MenuProps}
+            >
+              {["All", ...facilityOptions].map((facility) => (
+                <MenuItem key={facility} value={facility}>
+                  {facility}
+                </MenuItem>
+              ))}
+            </StyledSelect>
+          </FormControl>
+        </Grid>
+
+        {/* This is for MultiSelect 
+        <Grid item>
+          <FormControl sx={{ minWidth: 148 }}>
+            <StyledSelect
               multiple
               displayEmpty
               value={filters.facility}
@@ -185,7 +219,28 @@ function Actions({
             </StyledSelect>
           </FormControl>
         </Grid>
+        */}
+        <Grid item>
+          <FormControl sx={{ minWidth: 148 }}>
+            <StyledSelect
+              displayEmpty
+              value={filters.state}
+              onChange={handleChange("state")}
+              renderValue={(selected) =>
+                !selected || selected === "All" ? "State" : selected
+              }
+              MenuProps={MenuProps}
+            >
+              {["All", ...stateOptions].map((state) => (
+                <MenuItem key={state} value={state}>
+                  {state}
+                </MenuItem>
+              ))}
+            </StyledSelect>
+          </FormControl>
+        </Grid>
 
+        {/* This is for MultiSelect 
         <Grid item>
           <FormControl sx={{ minWidth: 148 }}>
             <StyledSelect
@@ -207,6 +262,7 @@ function Actions({
             </StyledSelect>
           </FormControl>
         </Grid>
+        */}
 
         <Grid
           item
@@ -214,7 +270,6 @@ function Actions({
             height: 36,
             display: "flex",
             alignItems: "center",
-            gap: 1,
             border: `1px solid ${theme.palette.secondary.main}`,
             borderRadius: 1,
             padding: "0 8px",
@@ -222,28 +277,30 @@ function Actions({
         >
           <Typography sx={{ fontSize: "0.875rem" }}>Status:</Typography>
           <StyledCheckboxLabel
+            sx={{ ml: 0 }}
             control={
               <Checkbox
-                checked={filters.status.includes("Paid")}
+                checked={filters.residentStatusPaid === 1}
                 onChange={(e) => {
-                  const newStatus = e.target.checked
-                    ? [...filters.status, "Paid", "Active"]
-                    : filters.status.filter((s) => s !== "Paid");
-                  setFilters((prev) => ({ ...prev, status: newStatus }));
+                  setFilters((prev) => ({
+                    ...prev,
+                    residentStatusPaid: e.target.checked ? 1 : 0,
+                  }));
                 }}
               />
             }
             label="Paid"
           />
           <StyledCheckboxLabel
+            sx={{ ml: 0 }}
             control={
               <Checkbox
-                checked={filters.status.includes("Unpaid")}
+                checked={filters.residentStatusUnpaid === 1}
                 onChange={(e) => {
-                  const newStatus = e.target.checked
-                    ? [...filters.status, "Unpaid", "Active"]
-                    : filters.status.filter((s) => s !== "Unpaid");
-                  setFilters((prev) => ({ ...prev, status: newStatus }));
+                  setFilters((prev) => ({
+                    ...prev,
+                    residentStatusUnpaid: e.target.checked ? 1 : 0,
+                  }));
                 }}
               />
             }

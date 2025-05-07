@@ -155,6 +155,13 @@ const CustomDatePicker = ({ value, onChange }) => {
       year: "numeric",
     });
 
+  const formatDate = (d) =>
+    d.toLocaleDateString("en-US", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
   const getDisplayRange = () => {
     if (!startDate) return "Select dates";
     if (!endDate || startDate.getTime() === endDate.getTime())
@@ -172,8 +179,8 @@ const CustomDatePicker = ({ value, onChange }) => {
       setEndDate(date);
       setIsSelectingRange(false);
       onChange({
-        startDate: startDate.toISOString(),
-        endDate: date.toISOString(),
+        startDate: formatDate(startDate),
+        endDate: formatDate(date),
       });
     }
   };
@@ -183,8 +190,8 @@ const CustomDatePicker = ({ value, onChange }) => {
     setEndDate(presetEnd);
     setIsOpen(false);
     onChange({
-      startDate: presetStart.toISOString(),
-      endDate: presetEnd.toISOString(),
+      startDate: formatDate(presetStart),
+      endDate: formatDate(presetEnd),
     });
   };
 
@@ -271,6 +278,17 @@ const CustomDatePicker = ({ value, onChange }) => {
                       ],
                     },
                     {
+                      label: "Since Last Week",
+                      range: [
+                        new Date(
+                          new Date().setDate(
+                            new Date().getDate() - new Date().getDay() - 7
+                          )
+                        ),
+                        new Date(),
+                      ],
+                    },
+                    {
                       label: "This Month",
                       range: [
                         new Date(
@@ -282,10 +300,56 @@ const CustomDatePicker = ({ value, onChange }) => {
                       ],
                     },
                     {
+                      label: "Since Last Month",
+                      range: [
+                        new Date(
+                          new Date().getFullYear(),
+                          new Date().getMonth() - 1,
+                          1
+                        ),
+                        new Date(),
+                      ],
+                    },
+                    {
                       label: "Last 3 Months",
                       range: [
                         new Date(
-                          new Date().setMonth(new Date().getMonth() - 3)
+                          new Date().getFullYear(),
+                          new Date().getMonth() - 3,
+                          1
+                        ),
+                        new Date(),
+                      ],
+                    },
+                    {
+                      label: "Last 6 Months",
+                      range: [
+                        new Date(
+                          new Date().getFullYear(),
+                          new Date().getMonth() - 6,
+                          1
+                        ),
+                        new Date(),
+                      ],
+                    },
+                    {
+                      label: "Last 9 Months",
+                      range: [
+                        new Date(
+                          new Date().getFullYear(),
+                          new Date().getMonth() - 9,
+                          1
+                        ),
+                        new Date(),
+                      ],
+                    },
+                    {
+                      label: "Last 12 Months",
+                      range: [
+                        new Date(
+                          new Date().getFullYear(),
+                          new Date().getMonth() - 12,
+                          1
                         ),
                         new Date(),
                       ],
@@ -297,19 +361,31 @@ const CustomDatePicker = ({ value, onChange }) => {
                         new Date(),
                       ],
                     },
+                    {
+                      label: "Since Last Year",
+                      range: [
+                        new Date(new Date().getFullYear() - 1, 0, 1),
+                        new Date(),
+                      ],
+                    },
                   ].map((preset) => (
                     <Button
                       key={preset.label}
                       variant="outlined"
                       size="small"
-                      color="primary"
+                      color="theme.palette.text.primary"
                       onClick={() => handlePresetClick(...preset.range)}
                       sx={{
                         justifyContent: "center",
                         textTransform: "none",
-                        fontWeight: 500,
-                        fontSize: "0.85rem",
+                        fontSize: "0.75rem",
                         borderRadius: "6px",
+
+                        "&:hover": {
+                          bgcolor: "secondary.light", // optional: Mira-style light green
+                          borderRadius: "6px", // ⬅️ force it to stay rounded on hover
+                          color: "white",
+                        },
                       }}
                     >
                       {preset.label}

@@ -10,26 +10,46 @@ const pool = new Pool({
 });
 
 export async function GET(req) {
+  function parseMDYY(str) {
+    const [month, day, year] = str.split("/");
+    return new Date(`20${year}`, month - 1, day); // 2-digit year → 20xx
+  }
+
   try {
     const { searchParams } = new URL(req.url);
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
-    const state = searchParams.get("state")?.split(",") || [];
-    const facility = searchParams.get("facility")?.split(",") || [];
-    const status = searchParams.get("status")?.split(",") || [];
-    console.log(`state: ${state}`);
-    console.log(`status: ${status}`);
-    const splitMedicaidPending =
-      searchParams.get("splitMedicaidPending") === "true";
+    const facility = searchParams.get("facility");
+    const residentStatusPaid = searchParams.get("residentStatusPaid");
+    const residentStatusUnpaid = searchParams.get("residentStatusUnpaid");
+    const payors = searchParams.get("payors");
+    const splitMedicaidPending = searchParams.get("splitMedicaidPending");
+    const state = searchParams.get("state") || "All";
+
+    console.log("startDate:", startDate);
+    console.log("endDate:", endDate);
+    console.log("facility:", facility);
+    console.log("residentStatusPaid:", residentStatusPaid);
+    console.log("residentStatusUnpaid:", residentStatusUnpaid);
 
     // Adjust this to your actual stored procedure or query
-    const result = await pool.query("SELECT cnt from testCensus2($1, $2)", [
-      startDate,
-      endDate,
-    ]);
+    const result = await pool.query(
+      "SELECT cnt FROM funcCensus($1, $2, $3, $4, $5, $6, $7, $8)",
+      [
+        parseMDYY(startDate),
+        parseMDYY(endDate),
+        facility,
+        residentStatusPaid,
+        residentStatusUnpaid,
+        payors,
+        splitMedicaidPending,
+        state,
+      ]
+    );
+
     console.log("Rows:", result.rows);
 
-    return NextResponse.json({ averageCensus: result.rows[0].cnt });
+    return NextResponse.json({ result: result.rows[0].cnt });
   } catch (error) {
     console.error("Error fetching census:", error);
     return NextResponse.json(

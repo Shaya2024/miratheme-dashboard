@@ -32,48 +32,84 @@ function CensusDashboard() {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(today.getDate() - 30);
 
-  const formatDate = (d) => d.toISOString().split("T")[0];
+  const formatDate = (d) =>
+    d.toLocaleDateString("en-US", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
   const [averageCensus, setAverageCensus] = useState(null);
   const [totalOccupancy, setTotalOccupancy] = useState(null);
   const [payorDistribution, setPayorDistribution] = useState(null);
   const [trendData, setTrendData] = useState(null);
   const [barChartData, setBarChartData] = useState(null);
-  const [stateOptions, setStateOptions] = useState(["MA", "CT", "RI"]);
-  const [facilityOptions, setFacilityOptions] = useState([
-    "Gallatine Manor",
-    "Agawam",
-    "Springfield",
-  ]);
+  const [stateOptions, setStateOptions] = useState([]);
+  const [facilityOptions, setFacilityOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const [filters, setFilters] = useState({
     startDate: formatDate(thirtyDaysAgo),
     endDate: formatDate(today),
-    state: [],
-    facility: [],
-    status: ["Active"],
-    payors: [],
-    splitMedicaidPending: false,
+    state: "All",
+    facility: "All",
+    residentStatusPaid: 0,
+    residentStatusUnpaid: 0,
+    payors: ["All"],
+    splitMedicaidPending: 0,
   });
 
   const queryString = new URLSearchParams({
     startDate: filters.startDate,
     endDate: filters.endDate,
-    facility: filters.facility.join(","),
-    status: filters.status.join(","),
+    facility: filters.facility[0] !== "" ? filters.facility : "All", // If I want to change to multiple I need to change this to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All",
+    residentStatusPaid: filters.residentStatusPaid,
+    residentStatusUnpaid: filters.residentStatusUnpaid,
     payors: filters.payors.join(","),
     splitMedicaidPending: filters.splitMedicaidPending.toString(),
-    state: filters.state.join(","),
+    state: filters.state[0] !== "" ? filters.state : "All", // If I want to change to multiple I need to change this to state: filters.state[0] !== "" ? filters.state.join(",") : "All",
   }).toString();
 
   console.log(`queryString: ${queryString}`);
-  console.log(`filters: ${filters.status}`);
+  console.log(`filters: ${JSON.stringify(filters)}`);
+
+  useEffect(() => {
+    fetch(`/api/census/getStates`)
+      .then((res) => res.json())
+      .then((data) => setStateOptions(data.result))
+      .catch((err) => console.error("Failed to load states", err));
+
+    fetch(`/api/census/getFacilities`)
+      .then((res) => res.json())
+      .then((data) => setFacilityOptions(data.result))
+      .catch((err) => console.error("Failed to load facilities", err));
+  }, []);
 
   useEffect(() => {
     fetch(`/api/census/getAverageCensus?${queryString}`)
       .then((res) => res.json())
-      .then((data) => setAverageCensus(data.averageCensus))
+      .then((data) => setAverageCensus(data.result))
       .catch((err) => console.error("Failed to load average census", err));
+
+    fetch(`/api/census/getTotalOccupancy?${queryString}`)
+      .then((res) => res.json())
+      .then((data) => setTotalOccupancy(data.totalOccupancy))
+      .catch((err) => console.error("Failed to load total occupancy", err));
+
+    /*fetch(`/api/census/getPayorDistribution?${queryString}`)
+      .then((res) => res.json())
+      .then((data) => setPayorDistribution(data.payorDistribution))
+      .catch((err) => console.error("Failed to load payor distribution", err));*/
+
+    fetch(`/api/census/getTrendData?${queryString}`)
+      .then((res) => res.json())
+      .then((data) => setTrendData(data.trendData))
+      .catch((err) => console.error("Failed to load trend data", err));
+
+    fetch(`/api/census/getBarChartData?${queryString}`)
+      .then((res) => res.json())
+      .then((data) => setBarChartData(data.barChartData))
+      .catch((err) => console.error("Failed to load bar chart data", err));
   }, [filters]);
 
   /*
