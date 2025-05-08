@@ -26,10 +26,11 @@ const ChartWrapper = styled.div`
 `;
 
 function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
+  const chartRef = useRef();
+
   if (!Array.isArray(dbData)) {
     return <div>Loading...</div>;
   }
-  const chartRef = useRef();
 
   console.log(`dbData for DoughnutChart: ${dbData}`);
 
