@@ -22,7 +22,7 @@ export async function GET(req) {
       "SELECT occupancypct from funcoccupancy",
       "SELECT * FROM payorpie_new",
       "SELECT * from censustrend",
-      "SELECT * from payorcensusbar",
+      "SELECT * FROM payorcensusbar_new",
     ];
 
     if (!allowed.includes(rawQuery)) {

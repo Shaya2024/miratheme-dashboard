@@ -61,7 +61,7 @@ function CensusDashboard() {
       facility: filters.facility[0] !== "" ? filters.facility : "All", // If I want to change to multiple I need to change this to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All",      residentStatusPaid: filters.residentStatusPaid,
       residentStatusUnpaid: filters.residentStatusUnpaid,
       payors: filters.payors.length ? filters.payors.join(",") : "All",
-      splitMedicaidPending: filters.splitMedicaidPending.toString(),
+      splitMedicaidPending: filters.splitMedicaidPending ? "1" : "0",
       state: filters.state[0] !== "" ? filters.state : "All", // If I want to change to multiple I need to change this to state: filters.state[0] !== "" ? filters.state.join(",") : "All",
     }).toString();
 
@@ -104,7 +104,7 @@ function CensusDashboard() {
 
     fetchProcedure("SELECT * from censustrend", setTrendData);
 
-    fetchProcedure("SELECT * from payorcensusbar", setBarChartData);
+    fetchProcedure("SELECT * FROM payorcensusbar_new", setBarChartData);
   }, [filters]);
 
   const { t } = useTranslation();
