@@ -23,6 +23,10 @@ const pagesSection = [
     title: "Census",
     children: [
       {
+        href: "/dashboard/census/census",
+        title: "Census",
+      },
+      {
         href: "/dashboard/census/admissions-1",
         title: "Admissions 1",
       },
