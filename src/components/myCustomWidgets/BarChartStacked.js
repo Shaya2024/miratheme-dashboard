@@ -34,6 +34,9 @@ const ChartWrapper = styled.div`
 `;
 
 function BarChart({ theme, dbData, title }) {
+  if (!Array.isArray(dbData)) {
+    return <div>Loading...</div>;
+  }
   const payors = Array.from(
     new Set(dbData.flatMap((f) => Object.keys(f.payors)))
   );

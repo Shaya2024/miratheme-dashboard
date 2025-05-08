@@ -26,15 +26,24 @@ const ChartWrapper = styled.div`
 `;
 
 function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
+  if (!Array.isArray(dbData)) {
+    return <div>Loading...</div>;
+  }
   const chartRef = useRef();
+
+  console.log(`dbData for DoughnutChart: ${dbData}`);
 
   const colorPalette = getPayorColors(theme);
 
-  const labels = dbData.map((d) => d.payer);
-  const percentages = dbData.map((d) => d.averagePercentage);
+  const labels = dbData.map((d) => d.payor);
 
-  const backgroundColor = labels.map((payer, index) =>
-    selected.length === 0 || selected.includes(payer)
+  const counts = dbData.map((d) => d.cnt);
+  const total = counts.reduce((sum, current) => sum + Number(current), 0);
+  console.log(`total ${total}`);
+  const percentages = counts.map((count) => ((count / total) * 100).toFixed(1));
+
+  const backgroundColor = labels.map((payor, index) =>
+    selected.length === 0 || selected.includes(payor)
       ? colorPalette[index % colorPalette.length]
       : "#ddd"
   );
@@ -75,10 +84,10 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
         callbacks: {
           label: (context) => {
             const index = context.dataIndex;
-            const count = dbData[index].averageCount;
-            const percent = dbData[index].averagePercentage;
-            const payer = dbData[index].payer;
-            return [`${payer}`, `Count: ${count}`, `Percent: ${percent}%`];
+            const count = dbData[index].cnt;
+            const percent = percentages[index];
+            const payor = dbData[index].payor;
+            return [`${payor}`, `Count: ${count}`, `Percent: ${percent}%`];
           },
         },
       },

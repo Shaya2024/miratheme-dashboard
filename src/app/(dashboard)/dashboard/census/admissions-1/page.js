@@ -92,19 +92,19 @@ function CensusDashboard() {
       .then((data) => setTotalOccupancy(data.totalOccupancy))
       .catch((err) => console.error("Failed to load total occupancy", err));
 
-    /*fetch(`/api/census/getPayorDistribution?${queryString}`)
+    fetch(`/api/census/getPayorDistribution?${queryString}`)
       .then((res) => res.json())
-      .then((data) => setPayorDistribution(data.payorDistribution))
-      .catch((err) => console.error("Failed to load payor distribution", err));*/
+      .then((data) => setPayorDistribution(data.result))
+      .catch((err) => console.error("Failed to load payor distribution", err));
 
     fetch(`/api/census/getTrendData?${queryString}`)
       .then((res) => res.json())
-      .then((data) => setTrendData(data.trendData))
+      .then((data) => setTrendData(data.result))
       .catch((err) => console.error("Failed to load trend data", err));
 
     fetch(`/api/census/getBarChartData?${queryString}`)
       .then((res) => res.json())
-      .then((data) => setBarChartData(data.barChartData))
+      .then((data) => setBarChartData(data.result))
       .catch((err) => console.error("Failed to load bar chart data", err));
   }, [filters]);
 
@@ -205,12 +205,12 @@ function CensusDashboard() {
 
     {
       payer: "HMO",
-      averagePercentage: 25,
+      averagePercentage: 20,
       averageCount: 75,
     },
     {
       payer: "Medicaid",
-      averagePercentage: 35,
+      averagePercentage: 25,
       averageCount: 105,
     },
     {
@@ -313,7 +313,7 @@ function CensusDashboard() {
           {/* Doughnut Chart section */}
           <div style={{ height: "100%" }}>
             <DoughnutChart
-              dbData={mockDoughnutChartData}
+              dbData={payorDistribution}
               title="Payor Distribution"
               selected={filters.payors}
               onSelectPayor={(newPayors) =>
