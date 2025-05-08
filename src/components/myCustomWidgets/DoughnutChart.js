@@ -94,10 +94,10 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
 
     if (onSelectPayor) {
       if (selected.includes(clickedPayor)) {
-        // remove
+        // Remove clicked payor
         onSelectPayor(selected.filter((p) => p !== clickedPayor));
       } else {
-        // add
+        // Add clicked payor
         onSelectPayor([...selected, clickedPayor]);
       }
     }

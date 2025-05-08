@@ -65,7 +65,7 @@ function CensusDashboard() {
     facility: filters.facility[0] !== "" ? filters.facility : "All", // If I want to change to multiple I need to change this to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All",
     residentStatusPaid: filters.residentStatusPaid,
     residentStatusUnpaid: filters.residentStatusUnpaid,
-    payors: filters.payors.join(","),
+    payors: filters.payors.length === 0 ? "All" : filters.payors.join(","),
     splitMedicaidPending: filters.splitMedicaidPending.toString(),
     state: filters.state[0] !== "" ? filters.state : "All", // If I want to change to multiple I need to change this to state: filters.state[0] !== "" ? filters.state.join(",") : "All",
   }).toString();
