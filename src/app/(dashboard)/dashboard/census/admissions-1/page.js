@@ -18,10 +18,6 @@ import LineChart from "@/components/myCustomWidgets/LineChart";
 import DoughnutChart from "@/components/myCustomWidgets/DoughnutChart";
 import Stats from "@/components/myCustomWidgets/Stats";
 import BarChartStacked from "@/components/myCustomWidgets/BarChartStacked";
-import FilterBar from "@/components/myCustomWidgets/filterBar";
-
-import Cards from "../../components/cards/page";
-import components from "@/theme/components";
 
 const Divider = styled(MuiDivider)(spacing);
 
@@ -249,6 +245,10 @@ function CensusDashboard() {
           <Typography variant="h3" gutterBottom>
             Census Dashboard
           </Typography>
+          <Typography variant="h4" gutterBottom>
+            Admissions 1
+          </Typography>
+
           <Typography variant="subtitle1">
             {t("Welcome back")}, Lucy! {t("We've missed you")}.{" "}
             <span role="img" aria-label="Waving Hand Sign">
