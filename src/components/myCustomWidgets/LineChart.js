@@ -75,6 +75,10 @@ const ChartWrapper = styled.div`
 `;
 
 function LineChart({ theme, dbData, title }) {
+  if (!Array.isArray(dbData)) {
+    return <div style={{ padding: "1rem" }}>Loading...</div>;
+  }
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -85,7 +89,7 @@ function LineChart({ theme, dbData, title }) {
   };
 
   const data = {
-    labels: dbData.map((d) => formatDate(d.Date)),
+    labels: dbData.map((d) => formatDate(d.census_date)),
     datasets: [
       {
         label: title,
@@ -107,7 +111,7 @@ function LineChart({ theme, dbData, title }) {
         borderColor: theme.palette.secondary.main,
         tension: 0.4,
         pointRadius: 4,
-        data: dbData.map((d) => d.Count),
+        data: dbData.map((d) => d.cnt),
       },
     ],
   };

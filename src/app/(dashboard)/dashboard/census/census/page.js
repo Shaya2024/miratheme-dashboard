@@ -1,10 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
-
 import {
   Grid,
   Divider as MuiDivider,
@@ -20,7 +18,6 @@ import Stats from "@/components/myCustomWidgets/Stats";
 import BarChartStacked from "@/components/myCustomWidgets/BarChartStacked";
 
 const Divider = styled(MuiDivider)(spacing);
-
 const Typography = styled(MuiTypography)(spacing);
 
 function CensusDashboard() {
@@ -47,28 +44,40 @@ function CensusDashboard() {
   const [filters, setFilters] = useState({
     startDate: formatDate(thirtyDaysAgo),
     endDate: formatDate(today),
-    state: "All",
-    facility: "All",
+    state: ["All"],
+    facility: ["All"],
     residentStatusPaid: 0,
     residentStatusUnpaid: 0,
     payors: [],
     splitMedicaidPending: 0,
   });
 
-  const queryString = new URLSearchParams({
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-    facility: filters.facility[0] !== "" ? filters.facility : "All", // If I want to change to multiple I need to change this to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All",
-    residentStatusPaid: filters.residentStatusPaid,
-    residentStatusUnpaid: filters.residentStatusUnpaid,
-    payors: filters.payors.length === 0 ? "All" : filters.payors.join(","),
-    splitMedicaidPending: filters.splitMedicaidPending.toString(),
-    state: filters.state[0] !== "" ? filters.state : "All", // If I want to change to multiple I need to change this to state: filters.state[0] !== "" ? filters.state.join(",") : "All",
-  }).toString();
+  // ✅ Shared query string builder
+  const buildQueryString = (procedure) =>
+    new URLSearchParams({
+      procedure,
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+      facility: filters.facility[0] !== "" ? filters.facility : "All", // If I want to change to multiple I need to change this to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All",      residentStatusPaid: filters.residentStatusPaid,
+      residentStatusUnpaid: filters.residentStatusUnpaid,
+      payors: filters.payors.length ? filters.payors.join(",") : "All",
+      splitMedicaidPending: filters.splitMedicaidPending.toString(),
+      state: filters.state[0] !== "" ? filters.state : "All", // If I want to change to multiple I need to change this to state: filters.state[0] !== "" ? filters.state.join(",") : "All",
+    }).toString();
 
-  console.log(`queryString: ${queryString}`);
-  console.log(`filters: ${JSON.stringify(filters)}`);
+  // ✅ Shared fetcher
+  const fetchProcedure = async (procedure, setterCallback) => {
+    try {
+      const query = buildQueryString(procedure);
+      const res = await fetch(`/api/census/getWidgetData?${query}`);
+      const data = await res.json();
+      setterCallback(data.result);
+    } catch (err) {
+      console.error(`Failed to load ${procedure}`, err);
+    }
+  };
 
+  // 🧠 Fetch state & facility options — unchanged
   useEffect(() => {
     fetch(`/api/census/getStates`)
       .then((res) => res.json())
@@ -81,100 +90,22 @@ function CensusDashboard() {
       .catch((err) => console.error("Failed to load facilities", err));
   }, []);
 
+  // 🧠 Fetch all widget data via shared method
   useEffect(() => {
-    fetch(`/api/census/getAverageCensus?${queryString}`)
-      .then((res) => res.json())
-      .then((data) => setAverageCensus(data.result))
-      .catch((err) => console.error("Failed to load average census", err));
+    fetchProcedure("SELECT cnt FROM funcCensus", (result) =>
+      setAverageCensus(result[0]?.cnt)
+    );
 
-    fetch(`/api/census/getTotalOccupancy?${queryString}`)
-      .then((res) => res.json())
-      .then((data) => setTotalOccupancy(data.totalOccupancy))
-      .catch((err) => console.error("Failed to load total occupancy", err));
+    fetchProcedure("SELECT occupancypct from funcoccupancy", (result) =>
+      setTotalOccupancy(result[0]?.occupancypct ?? "N/A")
+    );
 
-    fetch(`/api/census/getPayorDistribution?${queryString}`)
-      .then((res) => res.json())
-      .then((data) => setPayorDistribution(data.result))
-      .catch((err) => console.error("Failed to load payor distribution", err));
+    fetchProcedure("SELECT * FROM payorpie_new", setPayorDistribution);
 
-    fetch(`/api/census/getTrendData?${queryString}`)
-      .then((res) => res.json())
-      .then((data) => setTrendData(data.result))
-      .catch((err) => console.error("Failed to load trend data", err));
+    fetchProcedure("SELECT * from censustrend", setTrendData);
 
-    fetch(`/api/census/getBarChartData?${queryString}`)
-      .then((res) => res.json())
-      .then((data) => setBarChartData(data.result))
-      .catch((err) => console.error("Failed to load bar chart data", err));
+    fetchProcedure("SELECT * from payorcensusbar", setBarChartData);
   }, [filters]);
-
-  useEffect(() => {
-    console.log(`filters: ${JSON.stringify(filters)}`);
-  }, [filters]);
-
-  /*
-
-  useEffect(() => {
-    const fetchAverageCensus = async () => {
-      fetch(`/api/census/getAverageCensus?${queryString}`)
-        .then((res) => res.json())
-        .then((data) => setAverageCensus(data.averageCensus))
-        .catch((err) => console.error("Failed to load average census", err));
-    };
-
-    const fetchTotalOccupancy = async () => {
-      fetch(`/api/census/getTotalOccupancy?${queryString}`)
-        .then((res) => res.json())
-        .then((data) => setTotalOccupancy(data.totalOccupancy))
-        .catch((err) => console.error("Failed to load total occupancy", err));
-    };
-
-    const fetchPayorDistribution = async () => {
-      fetch(`/api/census/getPayorDistribution?${queryString}`)
-        .then((res) => res.json())
-        .then((data) => setPayorDistribution(data.payorDistribution))
-        .catch((err) =>
-          console.error("Failed to load payor distribution", err)
-        );
-    };
-
-    const fetchTrendData = async () => {
-      fetch(`/api/census/getTrendData?${queryString}`)
-        .then((res) => res.json())
-        .then((data) => setTrendData(data.trendData))
-        .catch((err) => console.error("Failed to load trend data", err));
-    };
-
-    const fetchBarChartData = async () => {
-      fetch(`/api/census/getBarChartData?${queryString}`)
-        .then((res) => res.json())
-        .then((data) => setBarChartData(data.barChartData))
-        .catch((err) => console.error("Failed to load bar chart data", err));
-    };
-
-    const fetchAll = async () => {
-      setLoading(true);
-      try {
-        await Promise.all([
-          fetchAverageCensus(),
-          fetchTotalOccupancy(),
-          fetchPayorDistribution(),
-          fetchTrendData(),
-          fetchBarChartData(),
-        ]);
-      } catch (err) {
-        console.error("Error fetching dashboard data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAll();
-  }, [filters]);
-*/
-  console.log(`averageCensus: ${averageCensus}`);
-  console.log(`startDate: ${filters.startDate}`);
-  console.log(`endDate: ${filters.endDate}`);
 
   const { t } = useTranslation();
 
@@ -193,35 +124,6 @@ function CensusDashboard() {
       facility: "Springfield",
       payors: { "Medicare A": 15, HMO: 30, Medicaid: 10, Private: 5 },
       totalAverage: 60,
-    },
-  ];
-
-  const mockDoughnutChartData = [
-    {
-      payer: "Medicare A",
-      averagePercentage: 40,
-      averageCount: 120,
-    },
-
-    {
-      payer: "HMO",
-      averagePercentage: 20,
-      averageCount: 75,
-    },
-    {
-      payer: "Medicaid",
-      averagePercentage: 25,
-      averageCount: 105,
-    },
-    {
-      payer: "Private",
-      averagePercentage: 10,
-      averageCount: 30,
-    },
-    {
-      payer: "VA",
-      averagePercentage: 5,
-      averageCount: 15,
     },
   ];
 
@@ -301,7 +203,7 @@ function CensusDashboard() {
               <Grid item size={{ xs: 6 }}>
                 <Stats
                   title="Total Occupancy %"
-                  amount="79%"
+                  amount={totalOccupancy}
                   chip="placeholder"
                   percentagetext="-14%"
                   percentagecolor={red[500]}
@@ -334,7 +236,7 @@ function CensusDashboard() {
         >
           {/* Line Chart */}
           <div>
-            <LineChart dbData={mockTrendData} title="Census Trend" />
+            <LineChart dbData={trendData} title="Census Trend" />
           </div>
 
           {/* Bar Chart */}

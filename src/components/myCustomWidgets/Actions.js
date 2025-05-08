@@ -159,7 +159,7 @@ function Actions({
         </Grid>
 
         <Grid item>
-          <FormControl sx={{ minWidth: 148 }}>
+          <FormControl sx={{ minWidth: 130 }}>
             <StyledSelect
               displayEmpty
               value={filters.state}
@@ -203,7 +203,7 @@ function Actions({
         */}
 
         <Grid item>
-          <FormControl sx={{ minWidth: 148 }}>
+          <FormControl sx={{ minWidth: 130 }}>
             <StyledSelect
               displayEmpty
               value={filters.facility}
@@ -212,7 +212,7 @@ function Actions({
                 !selected || selected === "All"
                   ? "Facility"
                   : selected.length > 3
-                  ? selected.slice(0, 13) + "…"
+                  ? selected.slice(0, 9) + "…"
                   : selected
               }
               MenuProps={MenuProps}
@@ -307,7 +307,7 @@ function Actions({
                 }
               />
             }
-            label="Split Medicaid Pending"
+            label="Medicaid Pending"
           />
         </Grid>
 

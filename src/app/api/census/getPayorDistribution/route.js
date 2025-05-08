@@ -28,7 +28,7 @@ export async function GET(req) {
 
     // Adjust this to your actual stored procedure or query
     const result = await pool.query(
-      "SELECT *from payorpie($1, $2, $3, $4, $5, $6, $7, $8)",
+      "SELECT *from payorpie($1, $2, $3, $4, $5,yes $6, $7, $8)",
       [
         startDate,
         endDate,
