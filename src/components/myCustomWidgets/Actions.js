@@ -3,33 +3,18 @@ import styled from "@emotion/styled";
 import CustomDatePicker from "./CustomDatePicker";
 
 import {
-  Popover,
   Button as MuiButton,
   FormControlLabel,
   Switch,
   MenuItem,
-  OutlinedInput,
-  CardContent,
   Checkbox,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormHelperText,
   Grid,
-  Input,
-  InputLabel,
-  Link,
-  ListItemText,
   Breadcrumbs as MuiBreadcrumbs,
   Card as MuiCard,
-  Divider,
   FormControl as MuiFormControl,
   Paper as MuiPaper,
   Select,
   Typography,
-  Box,
 } from "@mui/material";
 
 import {
@@ -177,6 +162,50 @@ function Actions({
           <FormControl sx={{ minWidth: 148 }}>
             <StyledSelect
               displayEmpty
+              value={filters.state}
+              onChange={handleChange("state")}
+              renderValue={(selected) =>
+                !selected || selected === "All" ? "State" : selected
+              }
+              MenuProps={MenuProps}
+            >
+              {["All", ...stateOptions].map((state) => (
+                <MenuItem key={state} value={state}>
+                  {state}
+                </MenuItem>
+              ))}
+            </StyledSelect>
+          </FormControl>
+        </Grid>
+
+        {/* This is for MultiSelect 
+        <Grid item>
+          <FormControl sx={{ minWidth: 148 }}>
+            <StyledSelect
+              multiple
+              displayEmpty
+              value={filters.state}
+              onChange={handleChange("state")}
+              renderValue={(selected) =>
+                selected.length > 0 ? selected.join(", ") : "State"
+              }
+              MenuProps={MenuProps}
+            >
+              {stateOptions.map((state) => (
+                <MenuItem key={state} value={state}>
+                  <Checkbox checked={filters.state.includes(state)} />
+                  <ListItemText primary={state} />
+                </MenuItem>
+              ))}
+            </StyledSelect>
+          </FormControl>
+        </Grid>
+        */}
+
+        <Grid item>
+          <FormControl sx={{ minWidth: 148 }}>
+            <StyledSelect
+              displayEmpty
               value={filters.facility}
               onChange={handleChange("facility")}
               renderValue={(selected) =>
@@ -214,49 +243,6 @@ function Actions({
                 <MenuItem key={facility} value={facility}>
                   <Checkbox checked={filters.facility.includes(facility)} />
                   <ListItemText primary={facility} />
-                </MenuItem>
-              ))}
-            </StyledSelect>
-          </FormControl>
-        </Grid>
-        */}
-        <Grid item>
-          <FormControl sx={{ minWidth: 148 }}>
-            <StyledSelect
-              displayEmpty
-              value={filters.state}
-              onChange={handleChange("state")}
-              renderValue={(selected) =>
-                !selected || selected === "All" ? "State" : selected
-              }
-              MenuProps={MenuProps}
-            >
-              {["All", ...stateOptions].map((state) => (
-                <MenuItem key={state} value={state}>
-                  {state}
-                </MenuItem>
-              ))}
-            </StyledSelect>
-          </FormControl>
-        </Grid>
-
-        {/* This is for MultiSelect 
-        <Grid item>
-          <FormControl sx={{ minWidth: 148 }}>
-            <StyledSelect
-              multiple
-              displayEmpty
-              value={filters.state}
-              onChange={handleChange("state")}
-              renderValue={(selected) =>
-                selected.length > 0 ? selected.join(", ") : "State"
-              }
-              MenuProps={MenuProps}
-            >
-              {stateOptions.map((state) => (
-                <MenuItem key={state} value={state}>
-                  <Checkbox checked={filters.state.includes(state)} />
-                  <ListItemText primary={state} />
                 </MenuItem>
               ))}
             </StyledSelect>

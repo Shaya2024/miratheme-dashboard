@@ -20,42 +20,38 @@ const pagesSection = [
   {
     href: "/dashboard",
     icon: Sliders,
-    title: "Dashboard 1",
+    title: "Census",
     children: [
       {
-        href: "/dashboard/census",
-        title: "Census",
+        href: "/dashboard/census/admissions-1",
+        title: "Admissions 1",
       },
       {
-        href: "/dashboard/analytics",
-        title: "Staffing",
-      },
-      {
-        href: "/dashboard/saas",
-        title: "PDPM",
+        href: "/dashboard/census/admissions-2",
+        title: "Admissions 2",
       },
     ],
   },
   {
-    href: "/pages",
+    href: "/dashboard",
     icon: Layout,
-    title: "Dashboard 2",
+    title: "IL Staffing",
     children: [
       {
-        href: "/pages/profile",
-        title: "Profile",
+        href: "/dashboard/il-staffing/daily-overview",
+        title: "Daily Overview",
       },
       {
-        href: "/pages/settings",
-        title: "Settings",
+        href: "/dashboard/il-staffing/requirements",
+        title: "Requirements",
       },
       {
-        href: "/pages/pricing",
-        title: "Pricing",
+        href: "/dashboard/il-staffing/trend",
+        title: "Trend",
       },
       {
-        href: "/pages/chat",
-        title: "Chat",
+        href: "/dashboard/il-staffing/rn-coverage",
+        title: "RN Coverage",
       },
       {
         href: "/pages/blank",

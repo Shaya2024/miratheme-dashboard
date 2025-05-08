@@ -17,11 +17,7 @@ import Actions from "@/components/myCustomWidgets/Actions";
 import LineChart from "@/components/myCustomWidgets/LineChart";
 import DoughnutChart from "@/components/myCustomWidgets/DoughnutChart";
 import Stats from "@/components/myCustomWidgets/Stats";
-import BarChart from "@/components/myCustomWidgets/BarChart";
-import FilterBar from "@/components/myCustomWidgets/filterBar";
-
-import Cards from "../../components/cards/page";
-import components from "@/theme/components";
+import BarChart from "@/components/myCustomWidgets/BarChartStacked";
 
 const Divider = styled(MuiDivider)(spacing);
 
