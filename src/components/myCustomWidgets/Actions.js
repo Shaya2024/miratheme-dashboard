@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "@emotion/styled";
-import { Calendar } from "lucide-react";
 import CustomDatePicker from "./CustomDatePicker";
 
 import {
@@ -36,6 +35,7 @@ import {
 import {
   Loop as LoopIcon,
   FilterList as FilterListIcon,
+  FileDownload as FileDownloadIcon,
 } from "@mui/icons-material";
 
 import { spacing } from "@mui/system";
@@ -323,6 +323,12 @@ function Actions({
             }
             label="Split Medicaid Pending"
           />
+        </Grid>
+
+        <Grid item>
+          <SmallButton size="small" mr={2}>
+            <FileDownloadIcon />
+          </SmallButton>
         </Grid>
 
         <Grid item>
