@@ -71,13 +71,50 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
   const options = {
     maintainAspectRatio: false,
     cutout: "55%",
+    layout: {
+      padding: {
+        top: 5,
+        right: 5,
+        bottom: 5,
+        left: 5,
+      },
+    },
     plugins: {
       datalabels: {
-        color: "#ffffff",
         formatter: (value) => `${value}%`,
         font: {
           weight: "regular",
           size: 14,
+        },
+        display: true,
+        clip: false,
+        anchor: function (context) {
+          const value = parseFloat(context.dataset.data[context.dataIndex]);
+          return value < 2 ? "end" : "center";
+        },
+        align: function (context) {
+          const value = parseFloat(context.dataset.data[context.dataIndex]);
+          if (value < 2) {
+            const meta = context.chart.getDatasetMeta(context.datasetIndex);
+            const element = meta.data[context.dataIndex];
+            const startAngle = element.startAngle;
+            const endAngle = element.endAngle;
+            const angle = (startAngle + endAngle) / 2;
+
+            if (angle >= 0 && angle < Math.PI / 2) return "start";
+            if (angle >= Math.PI / 2 && angle < Math.PI) return "end";
+            if (angle >= Math.PI && angle < (3 * Math.PI) / 2) return "end";
+            return "start";
+          }
+          return "center";
+        },
+        offset: function (context) {
+          const value = parseFloat(context.dataset.data[context.dataIndex]);
+          return value < 2 ? 2 : 0; // Changed back to 25 from 0
+        },
+        color: function (context) {
+          const value = parseFloat(context.dataset.data[context.dataIndex]);
+          return value < 2 ? theme.palette.text.primary : "#ffffff";
         },
       },
       legend: {
@@ -99,6 +136,44 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
             return [`${payor}`, `Count: ${count}`, `Percent: ${percent}%`];
           },
         },
+      },
+    },
+    animation: {
+      onComplete: function () {
+        // Draw leader lines after animation completes
+        const chart = chartRef.current;
+        if (!chart) return;
+
+        const ctx = chart.ctx;
+        const meta = chart.getDatasetMeta(0);
+
+        percentages.forEach((value, index) => {
+          if (parseFloat(value) < 2) {
+            const arc = meta.data[index];
+            const angle = (arc.startAngle + arc.endAngle) / 2;
+            const outerRadius = arc.outerRadius;
+
+            // Start point (on the arc)
+            const x1 = arc.x + Math.cos(angle) * outerRadius;
+            const y1 = arc.y + Math.sin(angle) * outerRadius;
+
+            // End point (extending outward)
+            const labelRadius = outerRadius + 10;
+            const x2 = arc.x + Math.cos(angle) * labelRadius;
+            const y2 = arc.y + Math.sin(angle) * labelRadius;
+            const wedgeColor = backgroundColor[index];
+
+            // Draw the line
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = wedgeColor;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.restore();
+          }
+        });
       },
     },
   };
