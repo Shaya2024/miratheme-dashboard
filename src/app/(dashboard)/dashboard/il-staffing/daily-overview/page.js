@@ -16,7 +16,7 @@ import Actions from "@/components/myCustomWidgets/Actions";
 import LineChart from "@/components/myCustomWidgets/LineChart";
 import DoughnutChart from "@/components/myCustomWidgets/DoughnutChart";
 import Stats from "@/components/myCustomWidgets/Stats";
-import BarChartStacked from "@/components/myCustomWidgets/BarChartStacked";
+import BarChartNotStacked from "@/components/myCustomWidgets/BarChartNotStacked";
 
 const Divider = styled(MuiDivider)(spacing);
 const Typography = styled(MuiTypography)(spacing);
