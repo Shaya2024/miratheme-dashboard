@@ -20,7 +20,7 @@ import BarChartNotStacked from "@/components/myCustomWidgets/BarChartNotStacked"
 const Divider = styled(MuiDivider)(spacing);
 const Typography = styled(MuiTypography)(spacing);
 
-function CensusDashboard() {
+function IlStaffingDailyOverview() {
   const today = new Date();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(today.getDate() - 30);
