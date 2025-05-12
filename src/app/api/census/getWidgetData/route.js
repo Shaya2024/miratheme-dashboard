@@ -8,17 +8,17 @@ const pool = new Pool({
 
 function parseMDYY(str) {
   const [month, day, year] = str.split("/");
-  return new Date(`20${year}`, month - 1, day); // Converts MM/DD/YY to Date
+  return new Date(20 + year, month - 1, day); // Converts MM/DD/YY to Date
 }
 
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
-    const rawQuery = searchParams.get("procedure");
+    const rawQuery = searchParams.get("selectCommand");
 
-    // Validate that the procedure string is in allowed formats
+    // Validate that the selectCommand string is in allowed formats
     const allowed = [
-      "SELECT cnt FROM funcCensus",
+      "SELECT * FROM funccensus_payorarry",
       "SELECT occupancypct from funcoccupancy",
       "SELECT * FROM payorpie_new",
       "SELECT * from censustrend",
@@ -36,9 +36,16 @@ export async function GET(req) {
     const facility = searchParams.get("facility");
     const residentStatusPaid = searchParams.get("residentStatusPaid");
     const residentStatusUnpaid = searchParams.get("residentStatusUnpaid");
-    const payors = searchParams.get("payors");
+    const payors = rawQuery.includes("funccensus_payorarry")
+      ? JSON.parse(searchParams.get("payors") || "[]")
+      : JSON.parse(searchParams.get("payors") || '["HMO"]')[0];
+
     const splitMedicaidPending = searchParams.get("splitMedicaidPending");
     const state = searchParams.get("state");
+
+    console.log(
+      `payors: ${JSON.stringify(payors)} and isPayorPie: ${isPayorPie}`
+    );
 
     // Build values array — omit 'payors' only for payorpie
     const values = isPayorPie
@@ -67,11 +74,11 @@ export async function GET(req) {
     const sql = `${rawQuery}(${paramPlaceholders})`;
 
     const result = await pool.query(sql, values);
-    console.log(
-      `raw query: ${rawQuery} and these are the result.rows for getWidgetData: ${JSON.stringify(
-        result.rows
-      )}`
-    );
+    console.log(`
+      raw query: ${rawQuery} and these are the result.rows for getWidgetData: ${JSON.stringify(
+      result.rows
+    )}
+    `);
     return NextResponse.json({ result: result.rows });
   } catch (err) {
     console.error("Error fetching widget data:", err);

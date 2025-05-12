@@ -37,8 +37,15 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
   const colorPalette = getPayorColors(theme);
 
   const labels = dbData.map((d) => d.payor);
+  const indexOfMedicaidPending = labels.indexOf("Medicaid Pending");
+  if (indexOfMedicaidPending !== -1) {
+    labels.push(...labels.splice(indexOfMedicaidPending, 1));
+  }
 
   const counts = dbData.map((d) => d.cnt);
+  if (indexOfMedicaidPending !== -1) {
+    counts.push(...counts.splice(indexOfMedicaidPending, 1));
+  }
   const total = counts.reduce((sum, current) => sum + Number(current), 0);
   console.log(`total ${total}`);
   const percentages = counts.map((count) => ((count / total) * 100).toFixed(1));
@@ -48,6 +55,7 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
       ? colorPalette[index % colorPalette.length]
       : "#ddd"
   );
+  console.log(`backgroundColor: ${backgroundColor}`);
 
   const data = {
     labels: labels,
@@ -85,9 +93,9 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
         callbacks: {
           label: (context) => {
             const index = context.dataIndex;
-            const count = dbData[index].cnt;
+            const count = counts[index];
             const percent = percentages[index];
-            const payor = dbData[index].payor;
+            const payor = labels[index];
             return [`${payor}`, `Count: ${count}`, `Percent: ${percent}%`];
           },
         },

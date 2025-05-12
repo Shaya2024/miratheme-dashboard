@@ -53,27 +53,29 @@ function CensusDashboard() {
   });
 
   // ✅ Shared query string builder
-  const buildQueryString = (procedure) =>
+  const buildQueryString = (selectCommand) =>
     new URLSearchParams({
-      procedure,
+      selectCommand: selectCommand,
       startDate: filters.startDate,
       endDate: filters.endDate,
-      facility: filters.facility[0] !== "" ? filters.facility : "All", // If I want to change to multiple I need to change this to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All",      residentStatusPaid: filters.residentStatusPaid,
+      facility: filters.facility[0] !== "" ? filters.facility : "All",
+      /* If I want to change to multiple, change to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All", */ residentStatusPaid:
+        filters.residentStatusPaid,
       residentStatusUnpaid: filters.residentStatusUnpaid,
-      payors: filters.payors.length ? filters.payors.join(",") : "All",
+      payors: JSON.stringify(filters.payors.length ? filters.payors : ["All"]),
       splitMedicaidPending: filters.splitMedicaidPending ? "1" : "0",
       state: filters.state[0] !== "" ? filters.state : "All", // If I want to change to multiple I need to change this to state: filters.state[0] !== "" ? filters.state.join(",") : "All",
     }).toString();
 
   // ✅ Shared fetcher
-  const fetchProcedure = async (procedure, setterCallback) => {
+  const fetchProcedure = async (selectCommand, setterCallback) => {
     try {
-      const query = buildQueryString(procedure);
+      const query = buildQueryString(selectCommand);
       const res = await fetch(`/api/census/getWidgetData?${query}`);
       const data = await res.json();
       setterCallback(data.result);
     } catch (err) {
-      console.error(`Failed to load ${procedure}`, err);
+      console.error(`Failed to load ${selectCommand}`, err);
     }
   };
 
@@ -92,7 +94,7 @@ function CensusDashboard() {
 
   // 🧠 Fetch all widget data via shared method
   useEffect(() => {
-    fetchProcedure("SELECT cnt FROM funcCensus", (result) =>
+    fetchProcedure("SELECT * FROM funccensus_payorarry", (result) =>
       setAverageCensus(result[0]?.cnt)
     );
 
@@ -148,7 +150,7 @@ function CensusDashboard() {
             Census Dashboard
           </Typography>
           <Typography variant="h4" gutterBottom>
-            Admissions 1
+            Census
           </Typography>
 
           <Typography variant="subtitle1">
@@ -193,7 +195,7 @@ function CensusDashboard() {
             <Grid container spacing={3}>
               <Grid item size={{ xs: 6 }}>
                 <Stats
-                  title="Average Census"
+                  title="Census"
                   amount={averageCensus}
                   chip="placeholder"
                   percentagetext="+26%"
@@ -202,7 +204,7 @@ function CensusDashboard() {
               </Grid>
               <Grid item size={{ xs: 6 }}>
                 <Stats
-                  title="Total Occupancy %"
+                  title="Occupancy %"
                   amount={totalOccupancy}
                   chip="placeholder"
                   percentagetext="-14%"
