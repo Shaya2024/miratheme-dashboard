@@ -1,5 +1,5 @@
 // Originally from components/pages/charts/chartjs/DoughnutChart
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import styled from "@emotion/styled";
 import { withTheme } from "@emotion/react";
 import { Doughnut } from "react-chartjs-2";
@@ -10,7 +10,51 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { getPayorColors } from "@/components/MyCustomUtils/colorPalette";
 
-ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
+// At the top of your file, outside the component
+const leaderLinePlugin = {
+  id: "leaderLine",
+  afterDatasetsDraw: (chart) => {
+    const ctx = chart.ctx;
+    const meta = chart.getDatasetMeta(0);
+
+    chart.config.data.datasets[0].data.forEach((value, index) => {
+      if (parseFloat(value) < 2) {
+        const arc = meta.data[index];
+        if (!arc) return;
+
+        const angle = (arc.startAngle + arc.endAngle) / 2;
+        const outerRadius = arc.outerRadius;
+
+        // Get color from the dataset
+        const wedgeColor = chart.config.data.datasets[0].backgroundColor[index];
+
+        // Draw line
+        const x1 = arc.x + Math.cos(angle) * outerRadius;
+        const y1 = arc.y + Math.sin(angle) * outerRadius;
+        const x2 = arc.x + Math.cos(angle) * (outerRadius + 10); // Match datalabel offset
+        const y2 = arc.y + Math.sin(angle) * (outerRadius + 10);
+
+        ctx.save();
+        ctx.strokeStyle = wedgeColor;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    });
+  },
+};
+
+// Register it once at the top level
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  ChartDataLabels,
+  leaderLinePlugin
+);
 
 const Card = styled(MuiCard)(spacing, {
   height: "100%",
@@ -28,11 +72,18 @@ const ChartWrapper = styled.div`
 function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
   const chartRef = useRef();
 
+  // Force chart update after initial render
+  useEffect(() => {
+    if (chartRef.current) {
+      setTimeout(() => {
+        chartRef.current.update();
+      }, 100);
+    }
+  }, [dbData]);
+
   if (!Array.isArray(dbData)) {
     return <div>Loading...</div>;
   }
-
-  console.log(`dbData for DoughnutChart: ${dbData}`);
 
   const colorPalette = getPayorColors(theme);
 
@@ -47,7 +98,6 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
     counts.push(...counts.splice(indexOfMedicaidPending, 1));
   }
   const total = counts.reduce((sum, current) => sum + Number(current), 0);
-  console.log(`total ${total}`);
   const percentages = counts.map((count) => ((count / total) * 100).toFixed(1));
 
   const backgroundColor = labels.map((payor, index) =>
@@ -55,7 +105,6 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
       ? colorPalette[index % colorPalette.length]
       : "#ddd"
   );
-  console.log(`backgroundColor: ${backgroundColor}`);
 
   const data = {
     labels: labels,
@@ -73,11 +122,14 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
     cutout: "55%",
     layout: {
       padding: {
-        top: 5,
-        right: 5,
-        bottom: 5,
-        left: 5,
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 20,
       },
+    },
+    animation: {
+      duration: 0, // Disable animation
     },
     plugins: {
       datalabels: {
@@ -110,7 +162,7 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
         },
         offset: function (context) {
           const value = parseFloat(context.dataset.data[context.dataIndex]);
-          return value < 2 ? 2 : 0; // Changed back to 25 from 0
+          return value < 2 ? 3 : 0; // Changed to proper offset value
         },
         color: function (context) {
           const value = parseFloat(context.dataset.data[context.dataIndex]);
@@ -138,62 +190,6 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
         },
       },
     },
-    animation: {
-      onComplete: function () {
-        // Draw leader lines after animation completes
-        const chart = chartRef.current;
-        if (!chart) return;
-
-        const ctx = chart.ctx;
-        const meta = chart.getDatasetMeta(0);
-
-        percentages.forEach((value, index) => {
-          if (parseFloat(value) < 2) {
-            const arc = meta.data[index];
-            const angle = (arc.startAngle + arc.endAngle) / 2;
-            const outerRadius = arc.outerRadius;
-
-            // Start point (on the arc)
-            const x1 = arc.x + Math.cos(angle) * outerRadius;
-            const y1 = arc.y + Math.sin(angle) * outerRadius;
-
-            // End point (extending outward)
-            const labelRadius = outerRadius + 10;
-            const x2 = arc.x + Math.cos(angle) * labelRadius;
-            const y2 = arc.y + Math.sin(angle) * labelRadius;
-            const wedgeColor = backgroundColor[index];
-
-            // Draw the line
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.strokeStyle = wedgeColor;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            ctx.restore();
-          }
-        });
-      },
-    },
-  };
-
-  const handleClick = (event) => {
-    const elements = getElementAtEvent(chartRef.current, event);
-    if (!elements.length) return;
-
-    const idx = elements[0].index;
-    const clickedPayor = data.labels[idx];
-
-    if (onSelectPayor) {
-      if (selected.includes(clickedPayor)) {
-        // Remove clicked payor
-        onSelectPayor(selected.filter((p) => p !== clickedPayor));
-      } else {
-        // Add clicked payor
-        onSelectPayor([...selected, clickedPayor]);
-      }
-    }
   };
 
   return (
@@ -210,7 +206,33 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
             ref={chartRef}
             data={data}
             options={options}
-            onClick={handleClick}
+            onClick={(event) => {
+              const chart = chartRef.current;
+              if (!chart) return;
+
+              const elements = chart.getElementsAtEventForMode(
+                event.nativeEvent,
+                "nearest",
+                { intersect: true },
+                true
+              );
+
+              if (!elements || elements.length === 0) {
+                console.log("No elements found");
+                return;
+              }
+
+              const idx = elements[0].index;
+              const clickedPayor = data.labels[idx];
+
+              if (onSelectPayor) {
+                if (selected.includes(clickedPayor)) {
+                  onSelectPayor(selected.filter((p) => p !== clickedPayor));
+                } else {
+                  onSelectPayor([...selected, clickedPayor]);
+                }
+              }
+            }}
           />
         </ChartWrapper>
       </CardContent>

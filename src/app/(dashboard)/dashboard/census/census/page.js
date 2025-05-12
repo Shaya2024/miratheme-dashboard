@@ -5,6 +5,7 @@ import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import {
   Grid,
+  Stack,
   Divider as MuiDivider,
   Typography as MuiTypography,
 } from "@mui/material";
@@ -147,7 +148,7 @@ function CensusDashboard() {
 
   return (
     <React.Fragment>
-      <Grid justifyContent="space-between" container spacing={6}>
+      <Stack justifyContent="space-between" spacing={6}>
         <Grid>
           <Typography variant="h3" gutterBottom>
             Census Dashboard
@@ -172,7 +173,7 @@ function CensusDashboard() {
             facilityOptions={facilityOptions}
           />
         </Grid>
-      </Grid>
+      </Stack>
       {/*<Grid container spacing={6}>
          <Grid
           size={{
