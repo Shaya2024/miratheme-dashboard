@@ -42,8 +42,8 @@ function CensusDashboard() {
   const [loading, setLoading] = useState(false);
 
   const [filters, setFilters] = useState({
-    startDate: formatDate(thirtyDaysAgo),
-    endDate: formatDate(today),
+    startDate: thirtyDaysAgo,
+    endDate: today,
     state: ["All"],
     facility: ["All"],
     residentStatusPaid: 0,
@@ -52,12 +52,13 @@ function CensusDashboard() {
     splitMedicaidPending: 0,
   });
 
+  console.log(`filters: ${JSON.stringify(filters)}`);
   // ✅ Shared query string builder
   const buildQueryString = (selectCommand) =>
     new URLSearchParams({
       selectCommand: selectCommand,
-      startDate: filters.startDate,
-      endDate: filters.endDate,
+      startDate: formatDate(filters.startDate),
+      endDate: formatDate(filters.endDate),
       facility: filters.facility[0] !== "" ? filters.facility : "All",
       /* If I want to change to multiple, change to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All", */ residentStatusPaid:
         filters.residentStatusPaid,
@@ -106,7 +107,9 @@ function CensusDashboard() {
 
     fetchProcedure("SELECT * from censustrend", setTrendData);
 
-    fetchProcedure("SELECT * FROM payorcensusbar_new", setBarChartData);
+    {
+      /*fetchProcedure("SELECT * FROM payorcensusbar_new", setBarChartData);*/
+    }
   }, [filters]);
 
   const { t } = useTranslation();

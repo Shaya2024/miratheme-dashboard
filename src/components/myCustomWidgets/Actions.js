@@ -115,30 +115,6 @@ function Actions({
     }));
   };
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-
-  const handleOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-
-  const handlePreset = (days) => {
-    const today = new Date();
-    const startDate = new Date();
-    startDate.setDate(today.getDate() - days);
-    setFilters((prev) => ({
-      ...prev,
-      startDate: startDate.toISOString(),
-      endDate: today.toISOString(),
-    }));
-    handleClose();
-  };
-
   return (
     <React.Fragment>
       <Grid container spacing={2}>

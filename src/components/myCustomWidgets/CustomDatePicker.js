@@ -54,12 +54,10 @@ const CustomDatePicker = ({ value, onChange }) => {
   const theme = useTheme();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [startDate, setStartDate] = useState(
-    value?.startDate ? new Date(value.startDate) : null
-  );
-  const [endDate, setEndDate] = useState(
-    value?.endDate ? new Date(value.endDate) : null
-  );
+  const [startDate, setStartDate] = useState(value?.startDate || null);
+
+  const [endDate, setEndDate] = useState(value?.endDate || null);
+
   const [isSelectingRange, setIsSelectingRange] = useState(false);
   const calendarRef = useRef();
 
@@ -155,13 +153,6 @@ const CustomDatePicker = ({ value, onChange }) => {
       year: "numeric",
     });
 
-  const formatDate = (d) =>
-    d.toLocaleDateString("en-US", {
-      year: "2-digit",
-      month: "2-digit",
-      day: "2-digit",
-    });
-
   const getDisplayRange = () => {
     if (!startDate) return "Select dates";
     if (!endDate || startDate.getTime() === endDate.getTime())
@@ -170,18 +161,20 @@ const CustomDatePicker = ({ value, onChange }) => {
   };
 
   const handleDateChange = (date) => {
-    if (!isSelectingRange || !startDate || date < startDate) {
+    if (!isSelectingRange) {
+      // First click (or 3rd, 5th, etc.)
       setStartDate(date);
-      setEndDate(null);
+      setEndDate(date); // treat it like a single-day range
       setIsSelectingRange(true);
-      onChange({ startDate: date.toISOString(), endDate: date.toISOString() });
+      onChange({ startDate: date, endDate: date });
     } else {
-      setEndDate(date);
+      // Second click (or 4th, 6th, etc.)
+      const [start, end] =
+        date < startDate ? [date, startDate] : [startDate, date];
+      setStartDate(start);
+      setEndDate(end);
       setIsSelectingRange(false);
-      onChange({
-        startDate: formatDate(startDate),
-        endDate: formatDate(date),
-      });
+      onChange({ startDate: start, endDate: end });
     }
   };
 
@@ -190,8 +183,8 @@ const CustomDatePicker = ({ value, onChange }) => {
     setEndDate(presetEnd);
     setIsOpen(false);
     onChange({
-      startDate: formatDate(presetStart),
-      endDate: formatDate(presetEnd),
+      startDate: presetStart,
+      endDate: presetEnd,
     });
   };
 

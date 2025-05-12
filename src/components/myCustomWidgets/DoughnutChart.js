@@ -2,7 +2,7 @@
 import React, { useRef } from "react";
 import styled from "@emotion/styled";
 import { withTheme } from "@emotion/react";
-import { Doughnut, getElementAtEvent } from "react-chartjs-2";
+import { Doughnut } from "react-chartjs-2";
 
 import { CardContent, Card as MuiCard, Typography } from "@mui/material";
 import { spacing } from "@mui/system";
