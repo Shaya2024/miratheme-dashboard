@@ -13,7 +13,6 @@ import { spacing } from "@mui/system";
 import { green, red } from "@mui/material/colors";
 
 import Actions from "@/components/myCustomWidgets/Actions";
-import LineChart from "@/components/myCustomWidgets/LineChart";
 import DoughnutChart from "@/components/myCustomWidgets/DoughnutChart";
 import Stats from "@/components/myCustomWidgets/Stats";
 import BarChartNotStacked from "@/components/myCustomWidgets/BarChartNotStacked";
