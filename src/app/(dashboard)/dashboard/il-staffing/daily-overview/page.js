@@ -1,13 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
-import { Container } from "@mui/material";
-
 import {
   Grid,
+  Stack,
   Divider as MuiDivider,
   Typography as MuiTypography,
 } from "@mui/material";
@@ -15,12 +13,15 @@ import { spacing } from "@mui/system";
 import { green, red } from "@mui/material/colors";
 
 import Actions from "@/components/myCustomWidgets/Actions";
-import BarChartNotStacked from "@/components/myCustomWidgets/BarChartNotStacked";
-const Divider = styled(MuiDivider)(spacing);
+import LineChart from "@/components/myCustomWidgets/LineChart";
+import DoughnutChart from "@/components/myCustomWidgets/DoughnutChart";
+import Stats from "@/components/myCustomWidgets/Stats";
+import BarChartStacked from "@/components/myCustomWidgets/BarChartStacked";
 
+const Divider = styled(MuiDivider)(spacing);
 const Typography = styled(MuiTypography)(spacing);
 
-function IlStaffingDailyOverview() {
+function CensusDashboard() {
   const today = new Date();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(today.getDate() - 30);
@@ -42,30 +43,45 @@ function IlStaffingDailyOverview() {
   const [loading, setLoading] = useState(false);
 
   const [filters, setFilters] = useState({
-    startDate: formatDate(thirtyDaysAgo),
-    endDate: formatDate(today),
-    state: "All",
-    facility: "All",
+    startDate: thirtyDaysAgo,
+    endDate: today,
+    state: ["All"],
+    facility: ["All"],
     residentStatusPaid: 0,
     residentStatusUnpaid: 0,
     payors: [],
     splitMedicaidPending: 0,
   });
 
-  const queryString = new URLSearchParams({
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-    facility: filters.facility[0] !== "" ? filters.facility : "All", // If I want to change to multiple I need to change this to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All",
-    residentStatusPaid: filters.residentStatusPaid,
-    residentStatusUnpaid: filters.residentStatusUnpaid,
-    payors: filters.payors.length === 0 ? "All" : filters.payors.join(","),
-    splitMedicaidPending: filters.splitMedicaidPending.toString(),
-    state: filters.state[0] !== "" ? filters.state : "All", // If I want to change to multiple I need to change this to state: filters.state[0] !== "" ? filters.state.join(",") : "All",
-  }).toString();
-
-  console.log(`queryString: ${queryString}`);
   console.log(`filters: ${JSON.stringify(filters)}`);
+  // ✅ Shared query string builder
+  const buildQueryString = (selectCommand) =>
+    new URLSearchParams({
+      selectCommand: selectCommand,
+      startDate: formatDate(filters.startDate),
+      endDate: formatDate(filters.endDate),
+      facility: filters.facility[0] !== "" ? filters.facility : "All",
+      /* If I want to change to multiple, change to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All", */ residentStatusPaid:
+        filters.residentStatusPaid,
+      residentStatusUnpaid: filters.residentStatusUnpaid,
+      payors: JSON.stringify(filters.payors.length ? filters.payors : ["All"]),
+      splitMedicaidPending: filters.splitMedicaidPending ? "1" : "0",
+      state: filters.state[0] !== "" ? filters.state : "All", // If I want to change to multiple I need to change this to state: filters.state[0] !== "" ? filters.state.join(",") : "All",
+    }).toString();
 
+  // ✅ Shared fetcher
+  const fetchProcedure = async (selectCommand, setterCallback) => {
+    try {
+      const query = buildQueryString(selectCommand);
+      const res = await fetch(`/api/census/getWidgetData?${query}`);
+      const data = await res.json();
+      setterCallback(data.result);
+    } catch (err) {
+      console.error(`Failed to load ${selectCommand}`, err);
+    }
+  };
+
+  // 🧠 Fetch state & facility options — unchanged
   useEffect(() => {
     fetch(`/api/census/getStates`)
       .then((res) => res.json())
@@ -78,97 +94,25 @@ function IlStaffingDailyOverview() {
       .catch((err) => console.error("Failed to load facilities", err));
   }, []);
 
+  // 🧠 Fetch all widget data via shared method
   useEffect(() => {
-    fetch(`/api/census/getAverageCensus?${queryString}`)
-      .then((res) => res.json())
-      .then((data) => setAverageCensus(data.result))
-      .catch((err) => console.error("Failed to load average census", err));
+    fetchProcedure("SELECT * FROM funccensus_payorarry", (result) =>
+      setAverageCensus(result[0]?.cnt)
+    );
 
-    fetch(`/api/census/getTotalOccupancy?${queryString}`)
-      .then((res) => res.json())
-      .then((data) => setTotalOccupancy(data.totalOccupancy))
-      .catch((err) => console.error("Failed to load total occupancy", err));
+    fetchProcedure("SELECT occupancypct from funcoccupancy", (result) =>
+      setTotalOccupancy(result[0]?.occupancypct ?? "N/A")
+    );
 
-    /*fetch(`/api/census/getPayorDistribution?${queryString}`)
-      .then((res) => res.json())
-      .then((data) => setPayorDistribution(data.payorDistribution))
-      .catch((err) => console.error("Failed to load payor distribution", err));*/
+    fetchProcedure("SELECT * FROM payorpie_new", setPayorDistribution);
 
-    fetch(`/api/census/getTrendData?${queryString}`)
-      .then((res) => res.json())
-      .then((data) => setTrendData(data.trendData))
-      .catch((err) => console.error("Failed to load trend data", err));
+    fetchProcedure("SELECT * from censustrend", setTrendData);
 
-    fetch(`/api/census/getBarChartData?${queryString}`)
-      .then((res) => res.json())
-      .then((data) => setBarChartData(data.barChartData))
-      .catch((err) => console.error("Failed to load bar chart data", err));
+    {
+      /*fetchProcedure("SELECT * FROM payorcensusbar_new", setBarChartData);*/
+    }
   }, [filters]);
 
-  useEffect(() => {
-    console.log(`filters: ${JSON.stringify(filters)}`);
-  }, [filters]);
-
-  /*
-
-  useEffect(() => {
-    const fetchAverageCensus = async () => {
-      fetch(`/api/census/getAverageCensus?${queryString}`)
-        .then((res) => res.json())
-        .then((data) => setAverageCensus(data.averageCensus))
-        .catch((err) => console.error("Failed to load average census", err));
-    };
-
-    const fetchTotalOccupancy = async () => {
-      fetch(`/api/census/getTotalOccupancy?${queryString}`)
-        .then((res) => res.json())
-        .then((data) => setTotalOccupancy(data.totalOccupancy))
-        .catch((err) => console.error("Failed to load total occupancy", err));
-    };
-
-    const fetchPayorDistribution = async () => {
-      fetch(`/api/census/getPayorDistribution?${queryString}`)
-        .then((res) => res.json())
-        .then((data) => setPayorDistribution(data.payorDistribution))
-        .catch((err) =>
-          console.error("Failed to load payor distribution", err)
-        );
-    };
-
-    const fetchTrendData = async () => {
-      fetch(`/api/census/getTrendData?${queryString}`)
-        .then((res) => res.json())
-        .then((data) => setTrendData(data.trendData))
-        .catch((err) => console.error("Failed to load trend data", err));
-    };
-
-    const fetchBarChartData = async () => {
-      fetch(`/api/census/getBarChartData?${queryString}`)
-        .then((res) => res.json())
-        .then((data) => setBarChartData(data.barChartData))
-        .catch((err) => console.error("Failed to load bar chart data", err));
-    };
-
-    const fetchAll = async () => {
-      setLoading(true);
-      try {
-        await Promise.all([
-          fetchAverageCensus(),
-          fetchTotalOccupancy(),
-          fetchPayorDistribution(),
-          fetchTrendData(),
-          fetchBarChartData(),
-        ]);
-      } catch (err) {
-        console.error("Error fetching dashboard data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAll();
-  }, [filters]);
-*/
   const { t } = useTranslation();
 
   const mockBarChartNotStackedData1 = [
