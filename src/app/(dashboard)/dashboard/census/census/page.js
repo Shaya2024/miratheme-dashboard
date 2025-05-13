@@ -45,8 +45,8 @@ function CensusDashboard() {
   const [filters, setFilters] = useState({
     startDate: thirtyDaysAgo,
     endDate: today,
-    state: ["All"],
-    facility: ["All"],
+    state: "All",
+    facility: "All",
     residentStatusPaid: 0,
     residentStatusUnpaid: 0,
     payors: [],
@@ -60,13 +60,13 @@ function CensusDashboard() {
       selectCommand: selectCommand,
       startDate: formatDate(filters.startDate),
       endDate: formatDate(filters.endDate),
-      facility: filters.facility[0] !== "" ? filters.facility : "All",
+      facility: filters.facility,
       /* If I want to change to multiple, change to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All", */
       residentStatusPaid: filters.residentStatusPaid,
       residentStatusUnpaid: filters.residentStatusUnpaid,
       payors: JSON.stringify(filters.payors.length ? filters.payors : ["All"]),
       splitMedicaidPending: filters.splitMedicaidPending ? "1" : "0",
-      state: filters.state[0] !== "" ? filters.state : "All", // If I want to change to multiple I need to change this to state: filters.state[0] !== "" ? filters.state.join(",") : "All",
+      state: filters.state, // If I want to change to multiple I need to change this to state: filters.state[0] !== "" ? filters.state.join(",") : "All",
     }).toString();
 
   // ✅ Shared fetcher
