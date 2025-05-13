@@ -55,19 +55,33 @@ function CensusDashboard() {
 
   console.log(`filters: ${JSON.stringify(filters)}`);
   // ✅ Shared query string builder
-  const buildQueryString = (selectCommand) =>
-    new URLSearchParams({
+  const buildQueryString = (selectCommand) => {
+    let localStartDate = filters.startDate;
+    const endDate = filters.endDate;
+
+    // 🧠 Only for censustrend_payorarry, adjust the startDate if same as endDate
+    if (selectCommand === "SELECT * from censustrend_payorarry") {
+      const start = new Date(filters.startDate);
+      const end = new Date(filters.endDate);
+      if (start.toDateString() === end.toDateString()) {
+        const newStart = new Date(end);
+        newStart.setDate(end.getDate() - 30);
+        localStartDate = newStart;
+      }
+    }
+
+    return new URLSearchParams({
       selectCommand: selectCommand,
-      startDate: formatDate(filters.startDate),
-      endDate: formatDate(filters.endDate),
+      startDate: formatDate(localStartDate),
+      endDate: formatDate(endDate),
       facility: filters.facility,
-      /* If I want to change to multiple, change to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All", */
       residentStatusPaid: filters.residentStatusPaid,
       residentStatusUnpaid: filters.residentStatusUnpaid,
       payors: JSON.stringify(filters.payors.length ? filters.payors : ["All"]),
       splitMedicaidPending: filters.splitMedicaidPending ? "1" : "0",
-      state: filters.state, // If I want to change to multiple I need to change this to state: filters.state[0] !== "" ? filters.state.join(",") : "All",
+      state: filters.state,
     }).toString();
+  };
 
   // ✅ Shared fetcher
   const fetchProcedure = async (selectCommand, setterCallback) => {
