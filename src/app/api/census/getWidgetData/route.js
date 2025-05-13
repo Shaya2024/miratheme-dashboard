@@ -19,10 +19,10 @@ export async function GET(req) {
     // Validate that the selectCommand string is in allowed formats
     const allowed = [
       "SELECT * FROM funccensus_payorarry",
-      "SELECT occupancypct from funcoccupancy",
+      "SELECT occupancypct from funcoccupancy_payorarry",
       "SELECT * FROM payorpie_new",
-      "SELECT * from censustrend",
-      "SELECT * FROM payorcensusbar_new",
+      "SELECT * from censustrend_payorarry",
+      "SELECT * from bar_census",
     ];
 
     if (!allowed.includes(rawQuery)) {
@@ -36,9 +36,7 @@ export async function GET(req) {
     const facility = searchParams.get("facility");
     const residentStatusPaid = searchParams.get("residentStatusPaid");
     const residentStatusUnpaid = searchParams.get("residentStatusUnpaid");
-    const payors = rawQuery.includes("funccensus_payorarry")
-      ? JSON.parse(searchParams.get("payors") || "[]")
-      : JSON.parse(searchParams.get("payors") || '["HMO"]')[0];
+    const payors = JSON.parse(searchParams.get("payors") || "[]");
 
     const splitMedicaidPending = searchParams.get("splitMedicaidPending");
     const state = searchParams.get("state");
@@ -74,12 +72,17 @@ export async function GET(req) {
     const sql = `${rawQuery}(${paramPlaceholders})`;
 
     const result = await pool.query(sql, values);
+    //  const result = await pool.query(`EXPLAIN ANALYZE ${sql}`, values);
+
     console.log(`
       raw query: ${rawQuery} and these are the result.rows for getWidgetData: ${JSON.stringify(
       result.rows
     )}
     `);
     return NextResponse.json({ result: result.rows });
+    // return NextResponse.json({
+    //   result: result.rows.map((r) => r["QUERY PLAN"]),
+    // });
   } catch (err) {
     console.error("Error fetching widget data:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

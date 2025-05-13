@@ -29,7 +29,6 @@ ChartJS.register(
 
 const Card = styled(MuiCard)(spacing);
 const ChartWrapper = styled.div`
-  height: 350px;
   width: 100%;
 `;
 
@@ -37,10 +36,37 @@ function BarChart({ theme, dbData, title }) {
   if (!Array.isArray(dbData)) {
     return <div>Loading...</div>;
   }
+
+  const grouped = {};
+
+  for (const item of dbData) {
+    const facility = item.facility;
+    const payor = item.payor;
+    const cnt = parseInt(item.cnt);
+
+    if (!grouped[facility]) {
+      grouped[facility] = {
+        facility: facility,
+        payors: {},
+        totalAverage: 0,
+      };
+    }
+
+    // Sum payor count
+    grouped[facility].payors[payor] =
+      (grouped[facility].payors[payor] || 0) + cnt;
+
+    // Update total
+    grouped[facility].totalAverage += cnt;
+  }
+
+  const finalOutput = Object.values(grouped);
+  console.log(finalOutput);
+
   const payors = Array.from(
-    new Set(dbData.flatMap((f) => Object.keys(f.payors)))
+    new Set(finalOutput.flatMap((f) => Object.keys(f.payors)))
   );
-  const categories = dbData.map((f) => f.facility);
+  const categories = finalOutput.map((f) => f.facility);
 
   const colorPalette = getPayorColors(theme);
   const payorColors = {};
@@ -52,7 +78,7 @@ function BarChart({ theme, dbData, title }) {
     labels: categories,
     datasets: payors.map((payor) => ({
       label: payor,
-      data: dbData.map((f) => f.payors[payor] || 0),
+      data: finalOutput.map((f) => f.payors[payor] || 0),
       backgroundColor: payorColors[payor] || "#ccc",
       borderWidth: 1,
     })),
@@ -78,7 +104,7 @@ function BarChart({ theme, dbData, title }) {
           color: theme.palette.text.primary,
           callback: function (value, index) {
             const label = categories[index];
-            const total = dbData[index].totalAverage ?? ""; // assumes you have totalAverage in dbData
+            const total = finalOutput[index].totalAverage ?? ""; // assumes you have totalAverage in dbData
             return [`${label}`, `Total: ${total}`]; // Multi-line label
           },
         },
@@ -123,7 +149,9 @@ function BarChart({ theme, dbData, title }) {
         <Typography variant="h6" gutterBottom>
           {title}
         </Typography>
-        <ChartWrapper>
+        <ChartWrapper
+          style={{ minHeight: "350px", height: `${finalOutput.length * 30}px` }}
+        >
           <Bar data={chartData} options={options} />
         </ChartWrapper>
       </CardContent>

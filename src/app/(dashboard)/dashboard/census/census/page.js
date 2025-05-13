@@ -61,8 +61,8 @@ function CensusDashboard() {
       startDate: formatDate(filters.startDate),
       endDate: formatDate(filters.endDate),
       facility: filters.facility[0] !== "" ? filters.facility : "All",
-      /* If I want to change to multiple, change to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All", */ residentStatusPaid:
-        filters.residentStatusPaid,
+      /* If I want to change to multiple, change to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All", */
+      residentStatusPaid: filters.residentStatusPaid,
       residentStatusUnpaid: filters.residentStatusUnpaid,
       payors: JSON.stringify(filters.payors.length ? filters.payors : ["All"]),
       splitMedicaidPending: filters.splitMedicaidPending ? "1" : "0",
@@ -100,17 +100,16 @@ function CensusDashboard() {
       setAverageCensus(result[0]?.cnt)
     );
 
-    fetchProcedure("SELECT occupancypct from funcoccupancy", (result) =>
-      setTotalOccupancy(result[0]?.occupancypct ?? "N/A")
+    fetchProcedure(
+      "SELECT occupancypct from funcoccupancy_payorarry",
+      (result) => setTotalOccupancy(result[0]?.occupancypct ?? "N/A")
     );
 
     fetchProcedure("SELECT * FROM payorpie_new", setPayorDistribution);
 
-    fetchProcedure("SELECT * from censustrend", setTrendData);
+    fetchProcedure("SELECT * from censustrend_payorarry", setTrendData);
 
-    {
-      /*fetchProcedure("SELECT * FROM payorcensusbar_new", setBarChartData);*/
-    }
+    fetchProcedure("SELECT * from bar_census", setBarChartData);
   }, [filters]);
 
   const { t } = useTranslation();
@@ -248,7 +247,7 @@ function CensusDashboard() {
           {/* Bar Chart */}
           <div>
             <BarChartStacked
-              dbData={mockBarChartData}
+              dbData={barChartData}
               title="Average Daily Census by Payor"
             />
           </div>
