@@ -16,7 +16,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { getPayorColors } from "@/components/MyCustomUtils/colorPalette";
+import { PAYOR_COLOR_MAP } from "@/components/MyCustomUtils/colorPalette";
 
 ChartJS.register(
   CategoryScale,
@@ -68,18 +68,14 @@ function BarChart({ theme, dbData, title }) {
   );
   const categories = finalOutput.map((f) => f.facility);
 
-  const colorPalette = getPayorColors(theme);
-  const payorColors = {};
-  payors.forEach((payor, index) => {
-    payorColors[payor] = colorPalette[index % colorPalette.length];
-  });
+  const payorColorMap = PAYOR_COLOR_MAP(theme);
 
   const chartData = {
     labels: categories,
     datasets: payors.map((payor) => ({
       label: payor,
       data: finalOutput.map((f) => f.payors[payor] || 0),
-      backgroundColor: payorColors[payor] || "#ccc",
+      backgroundColor: payorColorMap[payor] || "#ccc",
       borderWidth: 1,
     })),
   };

@@ -8,7 +8,7 @@ import { CardContent, Card as MuiCard, Typography } from "@mui/material";
 import { spacing } from "@mui/system";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { getPayorColors } from "@/components/MyCustomUtils/colorPalette";
+import { PAYOR_COLOR_MAP } from "@/components/MyCustomUtils/colorPalette";
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
@@ -34,7 +34,7 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
 
   console.log(`dbData for DoughnutChart: ${dbData}`);
 
-  const colorPalette = getPayorColors(theme);
+  const payorColorMap = PAYOR_COLOR_MAP(theme);
 
   const labels = dbData.map((d) => d.payor);
   const indexOfMedicaidPending = labels.indexOf("Medicaid Pending");
@@ -50,12 +50,11 @@ function DoughnutChart({ theme, dbData, title, onSelectPayor, selected }) {
   console.log(`total ${total}`);
   const percentages = counts.map((count) => ((count / total) * 100).toFixed(1));
 
-  const backgroundColor = labels.map((payor, index) =>
+  const backgroundColor = labels.map((payor) =>
     selected.length === 0 || selected.includes(payor)
-      ? colorPalette[index % colorPalette.length]
+      ? payorColorMap[payor] || "#ccc"
       : "#ddd"
   );
-  console.log(`backgroundColor: ${backgroundColor}`);
 
   const data = {
     labels: labels,
