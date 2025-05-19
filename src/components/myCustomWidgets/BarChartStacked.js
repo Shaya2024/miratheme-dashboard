@@ -101,7 +101,8 @@ function BarChart({ theme, dbData, title }) {
           callback: function (value, index) {
             const label = categories[index];
             const total = finalOutput[index].totalAverage ?? ""; // assumes you have totalAverage in dbData
-            return [`${label}`, `Total: ${total}`]; // Multi-line label
+            return `${label}, Total: ${total}`;
+            //return [`${label}`, `Total: ${total}`]; // Multi-line label
           },
         },
         grid: {

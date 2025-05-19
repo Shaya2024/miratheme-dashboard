@@ -72,7 +72,7 @@ export async function GET(req) {
     const sql = `${rawQuery}(${paramPlaceholders})`;
 
     const result = await pool.query(sql, values);
-    //  const result = await pool.query(`EXPLAIN ANALYZE ${sql}`, values);
+    //(for checking query times)// const result = await pool.query(`EXPLAIN ANALYZE ${sql}`, values);
 
     console.log(`
       raw query: ${rawQuery} and these are the result.rows for getWidgetData: ${JSON.stringify(
@@ -80,9 +80,9 @@ export async function GET(req) {
     )}
     `);
     return NextResponse.json({ result: result.rows });
-    // return NextResponse.json({
-    //   result: result.rows.map((r) => r["QUERY PLAN"]),
-    // });
+    /* return NextResponse.json({
+      result: result.rows.map((r) => r["QUERY PLAN"]),
+    }); */
   } catch (err) {
     console.error("Error fetching widget data:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

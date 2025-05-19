@@ -94,7 +94,7 @@ const Stats = ({
   title,
   amount,
   chip,
-  percentagetext,
+  percentagetext = "",
   percentagecolor,
   illustration,
 }) => {

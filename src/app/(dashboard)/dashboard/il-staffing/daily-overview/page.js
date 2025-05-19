@@ -3,27 +3,80 @@
 import React, { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
+import CustomSingleDatePicker from "@/components/myCustomWidgets/CustomSingleDatePicker";
 import {
-  Grid,
-  Stack,
   Divider as MuiDivider,
   Typography as MuiTypography,
 } from "@mui/material";
-import { spacing } from "@mui/system";
-import { green, red } from "@mui/material/colors";
 
-import Actions from "@/components/myCustomWidgets/Actions";
-import DoughnutChart from "@/components/myCustomWidgets/DoughnutChart";
-import Stats from "@/components/myCustomWidgets/Stats";
 import BarChartNotStacked from "@/components/myCustomWidgets/BarChartNotStacked";
+
+import {
+  Button as MuiButton,
+  FormControlLabel,
+  MenuItem,
+  Grid,
+  FormControl as MuiFormControl,
+  Select,
+  Stack,
+} from "@mui/material";
+
+import {
+  Loop as LoopIcon,
+  FilterList as FilterListIcon,
+  FileDownload as FileDownloadIcon,
+} from "@mui/icons-material";
+
+import { spacing } from "@mui/system";
 
 const Divider = styled(MuiDivider)(spacing);
 const Typography = styled(MuiTypography)(spacing);
 
+const FormControlSpacing = styled(MuiFormControl)(spacing);
+
+const FormControl = styled(FormControlSpacing)`
+  display: flex;
+  justify-content: center;
+`;
+
+const Button = styled(MuiButton)(spacing);
+
+const SmallButton = styled(Button)`
+  padding: 4px;
+  min-width: 0;
+
+  svg {
+    width: 0.9em;
+    height: 0.9em;
+  }
+`;
+
+const StyledSelect = styled(Select)(({ theme }) => ({
+  backgroundColor: theme.palette.secondary.main,
+  color: "white",
+  borderRadius: 4,
+  height: 36,
+  fontSize: "0.875rem",
+  paddingLeft: 12,
+  paddingRight: 12,
+  display: "flex",
+  alignItems: "center",
+  ".MuiSelect-select": {
+    display: "flex",
+    alignItems: "center",
+    padding: "0 !important",
+    height: "100%",
+  },
+  ".MuiSelect-icon": {
+    color: "white",
+  },
+  "& fieldset": {
+    border: "none",
+  },
+}));
+
 function IlStaffingDailyOverview() {
   const today = new Date();
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(today.getDate() - 30);
 
   const formatDate = (d) =>
     d.toLocaleDateString("en-US", {
@@ -32,85 +85,102 @@ function IlStaffingDailyOverview() {
       day: "2-digit",
     });
 
-  const [averageCensus, setAverageCensus] = useState(null);
-  const [totalOccupancy, setTotalOccupancy] = useState(null);
-  const [payorDistribution, setPayorDistribution] = useState(null);
-  const [trendData, setTrendData] = useState(null);
-  const [barChartData, setBarChartData] = useState(null);
-  const [stateOptions, setStateOptions] = useState([]);
+  const [query1, setQuery1] = useState([]);
+  const [query2, setQuery2] = useState([]);
+  const [query3, setQuery3] = useState([]);
+  const [query4, setQuery4] = useState([]);
+  const [regionOptions, setRegionOptions] = useState([]);
   const [facilityOptions, setFacilityOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  console.log(`query1: ${JSON.stringify(query1)}`);
+  console.log(`query2: ${JSON.stringify(query2)}`);
+  console.log(`query3: ${JSON.stringify(query3)}`);
+  console.log(`query4: ${JSON.stringify(query4)}`);
+
   const [filters, setFilters] = useState({
-    startDate: thirtyDaysAgo,
-    endDate: today,
-    state: ["All"],
-    facility: ["All"],
-    residentStatusPaid: 0,
-    residentStatusUnpaid: 0,
-    payors: [],
-    splitMedicaidPending: 0,
+    date: today,
+    region: "All",
+    facility: "All",
   });
 
-  console.log(`filters: ${JSON.stringify(filters)}`);
   // ✅ Shared query string builder
-  const buildQueryString = (selectCommand) =>
-    new URLSearchParams({
-      selectCommand: selectCommand,
-      startDate: formatDate(filters.startDate),
-      endDate: formatDate(filters.endDate),
-      facility: filters.facility[0] !== "" ? filters.facility : "All",
-      /* If I want to change to multiple, change to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All", */ residentStatusPaid:
-        filters.residentStatusPaid,
-      residentStatusUnpaid: filters.residentStatusUnpaid,
-      payors: JSON.stringify(filters.payors.length ? filters.payors : ["All"]),
-      splitMedicaidPending: filters.splitMedicaidPending ? "1" : "0",
-      state: filters.state[0] !== "" ? filters.state : "All", // If I want to change to multiple I need to change this to state: filters.state[0] !== "" ? filters.state.join(",") : "All",
+  const buildQueryString = (selectCommand, args = {}) => {
+    return new URLSearchParams({
+      selectCommand,
+      ...Object.fromEntries(
+        Object.entries(args).map(([key, val]) => [
+          key,
+          key === "payors" ? JSON.stringify(val) : val,
+        ])
+      ),
     }).toString();
+  };
 
   // ✅ Shared fetcher
-  const fetchProcedure = async (selectCommand, setterCallback) => {
+  const fetchProcedure = async (selectCommand, handleData, args = {}) => {
     try {
-      const query = buildQueryString(selectCommand);
-      const res = await fetch(`/api/census/getWidgetData?${query}`);
+      const query = buildQueryString(selectCommand, args);
+      const res = await fetch(`/api/census/getWidgetData3?${query}`);
       const data = await res.json();
-      setterCallback(data.result);
+      handleData(data.result); // let the caller decide what to do with result
     } catch (err) {
       console.error(`Failed to load ${selectCommand}`, err);
     }
   };
 
-  // 🧠 Fetch state & facility options — unchanged
-  useEffect(() => {
-    fetch(`/api/census/getStates`)
-      .then((res) => res.json())
-      .then((data) => setStateOptions(data.result))
-      .catch((err) => console.error("Failed to load states", err));
-
-    fetch(`/api/census/getFacilities`)
-      .then((res) => res.json())
-      .then((data) => setFacilityOptions(data.result))
-      .catch((err) => console.error("Failed to load facilities", err));
-  }, []);
-
   // 🧠 Fetch all widget data via shared method
   useEffect(() => {
-    fetchProcedure("SELECT * FROM funccensus_payorarry", (result) =>
-      setAverageCensus(result[0]?.cnt)
+    const args = {
+      facility: filters.facility,
+      date: formatDate(filters.date),
+      region: filters.region,
+    };
+
+    fetchProcedure(
+      "SELECT * FROM total_hours_page1",
+      (result) => {
+        setQuery1(result);
+      },
+      args
     );
 
-    fetchProcedure("SELECT occupancypct from funcoccupancy", (result) =>
-      setTotalOccupancy(result[0]?.occupancypct ?? "N/A")
+    fetchProcedure(
+      "SELECT * FROM total_hours_worked_page1",
+      (result) => {
+        setQuery2(result);
+      },
+      args
     );
 
-    fetchProcedure("SELECT * FROM payorpie_new", setPayorDistribution);
+    fetchProcedure(
+      "SELECT * FROM total_nursing_hours_worked_page1",
+      (result) => {
+        setQuery3(result);
+      },
+      args
+    );
 
-    fetchProcedure("SELECT * from censustrend", setTrendData);
-
-    {
-      /*fetchProcedure("SELECT * FROM payorcensusbar_new", setBarChartData);*/
-    }
+    fetchProcedure(
+      "SELECT * FROM total_rn_hours_worked_page1",
+      (result) => {
+        setQuery4(result);
+      },
+      args
+    );
   }, [filters]);
+
+  useEffect(() => {
+    fetchProcedure(
+      "SELECT DISTINCT \"Facility_Name\" FROM census_staffing WHERE state = 'IL'",
+      setFacilityOptions
+    );
+
+    fetchProcedure(
+      "SELECT DISTINCT region FROM census_staffing WHERE state = 'IL'",
+      setRegionOptions
+    );
+  }, []);
 
   const { t } = useTranslation();
 
@@ -148,9 +218,76 @@ function IlStaffingDailyOverview() {
     { facility: "Agwam Wwest", value: 9 },
   ];
 
+  const chart1Data =
+    Array.isArray(query1) && Array.isArray(query2)
+      ? query1.map((q1) => {
+          const q2 = query2.find((q) => q.facility_name === q1.facility_name);
+          return {
+            facility: q1.facility_name,
+            value:
+              (parseFloat(q1.sum_total) || 0) +
+              (parseFloat(q2?.hours_worked) || 0),
+          };
+        })
+      : [];
+
+  const chart2Data =
+    Array.isArray(query1) && Array.isArray(query3)
+      ? query1.map((q1) => {
+          const q3 = query3.find((q) => q.facility_name === q1.facility_name);
+          return {
+            facility: q1.facility_name,
+            value:
+              (parseFloat(q1.sum_total) || 0) +
+              (parseFloat(q3?.hours_worked) || 0),
+          };
+        })
+      : [];
+
+  const chart3Data =
+    Array.isArray(query1) && Array.isArray(query3)
+      ? query1.map((q1) => {
+          const q4 = query4.find((q) => q.facility_name === q1.facility_name);
+          return {
+            facility: q1.facility_name,
+            value:
+              (parseFloat(q1.sum_total) || 0) +
+              (parseFloat(q4?.hours_worked) || 0),
+          };
+        })
+      : [];
+
+  const ITEM_HEIGHT = 48;
+  const ITEM_PADDING_TOP = 8;
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250,
+      },
+    },
+  };
+
+  /* For multiselect 
+    const handleChange = (field) => (event) => {
+    const value = event.target.value;
+    setFilters((prev) => ({
+      ...prev,
+      [field]: value.includes("All") ? [] : value,
+    }));
+  };
+  */
+
+  const handleChange = (field) => (event) => {
+    setFilters((prev) => ({
+      ...prev,
+      [field]: event.target.value,
+    }));
+  };
+
   return (
     <React.Fragment>
-      <Grid justifyContent="space-between" container spacing={6}>
+      <Stack justifyContent="space-between" spacing={6}>
         <Grid>
           <Typography variant="h3" gutterBottom>
             IL Staffing Dashboard
@@ -167,30 +304,145 @@ function IlStaffingDailyOverview() {
         </Grid>
 
         <Grid>
-          <Actions
-            filters={filters}
-            setFilters={setFilters}
-            stateOptions={stateOptions}
-            facilityOptions={facilityOptions}
-          />
+          <Grid container spacing={2}>
+            <Grid item>
+              <CustomSingleDatePicker
+                value={filters.date}
+                onChange={(date) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    date,
+                  }))
+                }
+              />
+            </Grid>
+
+            {/* This is for MultiSelect 
+        <Grid item>
+          <FormControl sx={{ minWidth: 148 }}>
+            <StyledSelect
+              multiple
+              displayEmpty
+              value={filters.state}
+              onChange={handleChange("state")}
+              renderValue={(selected) =>
+                selected.length > 0 ? selected.join(", ") : "State"
+              }
+              MenuProps={MenuProps}
+            >
+              {stateOptions.map((state) => (
+                <MenuItem key={state} value={state}>
+                  <Checkbox checked={filters.state.includes(state)} />
+                  <ListItemText primary={state} />
+                </MenuItem>
+              ))}
+            </StyledSelect>
+          </FormControl>
         </Grid>
-      </Grid>
+        */}
+
+            <Grid item>
+              <FormControl sx={{ minWidth: 130 }}>
+                <StyledSelect
+                  displayEmpty
+                  value={filters.region}
+                  onChange={handleChange("region")}
+                  renderValue={(selected) =>
+                    !selected || selected === "All" ? "Region" : selected
+                  }
+                  MenuProps={MenuProps}
+                >
+                  {["All", ...regionOptions.map((r) => r.region)].map(
+                    (region) => (
+                      <MenuItem key={region} value={region}>
+                        {region}
+                      </MenuItem>
+                    )
+                  )}
+                </StyledSelect>
+              </FormControl>
+            </Grid>
+
+            {/* This is for MultiSelect 
+        <Grid item>
+          <FormControl sx={{ minWidth: 148 }}>
+            <StyledSelect
+              multiple
+              displayEmpty
+              value={filters.facility}
+              onChange={handleChange("facility")}
+              renderValue={(selected) =>
+                selected.length > 0 ? selected.join(", ") : "Facility"
+              }
+              MenuProps={MenuProps}
+            >
+              {facilityOptions.map((facility) => (
+                <MenuItem key={facility} value={facility}>
+                  <Checkbox checked={filters.facility.includes(facility)} />
+                  <ListItemText primary={facility} />
+                </MenuItem>
+              ))}
+            </StyledSelect>
+          </FormControl>
+        </Grid>
+        */}
+
+            <Grid item>
+              <FormControl sx={{ minWidth: 130 }}>
+                <StyledSelect
+                  displayEmpty
+                  value={filters.facility}
+                  onChange={handleChange("facility")}
+                  renderValue={(selected) =>
+                    !selected || selected === "All"
+                      ? "Facility"
+                      : selected.length > 3
+                      ? selected.slice(0, 9) + "…"
+                      : selected
+                  }
+                  MenuProps={MenuProps}
+                >
+                  {["All", ...facilityOptions.map((f) => f.Facility_Name)].map(
+                    (facility) => (
+                      <MenuItem key={facility} value={facility}>
+                        {facility}
+                      </MenuItem>
+                    )
+                  )}
+                </StyledSelect>
+              </FormControl>
+            </Grid>
+
+            <Grid item>
+              <SmallButton size="small" mr={2}>
+                <FileDownloadIcon />
+              </SmallButton>
+            </Grid>
+
+            <Grid item>
+              <SmallButton size="small" mr={2}>
+                <FilterListIcon />
+              </SmallButton>
+            </Grid>
+
+            <Grid item>
+              <SmallButton size="small" mr={2}>
+                <LoopIcon />
+              </SmallButton>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Stack>
 
       <Divider my={3} />
 
+      <BarChartNotStacked dbData={chart1Data} title="Total Hours" />
       <BarChartNotStacked
-        dbData={mockBarChartNotStackedData1}
-        title="Total Hours"
-      />
-      <BarChartNotStacked
-        dbData={mockBarChartNotStackedData2}
+        dbData={chart2Data}
         title="Nursing Hours
 "
       />
-      <BarChartNotStacked
-        dbData={mockBarChartNotStackedData3}
-        title="RN Hours"
-      />
+      <BarChartNotStacked dbData={chart3Data} title="RN Hours" />
     </React.Fragment>
   );
 }

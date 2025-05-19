@@ -3,6 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import { useTheme } from "@mui/material/styles";
+import { Select, MenuItem, TextField } from "@mui/material"; // Make sure this is imported
 import {
   IconButton,
   Typography,
@@ -19,37 +20,57 @@ const CustomHeader = ({
   increaseMonth,
   prevMonthButtonDisabled,
   nextMonthButtonDisabled,
-}) => (
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      margin: "10px",
-    }}
-  >
-    <IconButton
-      onClick={decreaseMonth}
-      disabled={prevMonthButtonDisabled}
-      size="small"
+  changeYear,
+}) => {
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 30 }, (_, i) => currentYear - i);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        margin: "10px",
+        gap: "0.5rem",
+        width: "100%",
+      }}
     >
-      <ChevronLeft fontSize="small" />
-    </IconButton>
+      <IconButton onClick={decreaseMonth} size="small">
+        <ChevronLeft fontSize="small" />
+      </IconButton>
 
-    <Typography variant="subtitle2" fontWeight={600}>
-      {date.toLocaleString("default", { month: "long", year: "numeric" })}
-    </Typography>
+      <Typography variant="subtitle2" fontWeight={600}>
+        {date.toLocaleString("default", { month: "long" })}
+      </Typography>
 
-    <IconButton
-      onClick={increaseMonth}
-      disabled={nextMonthButtonDisabled}
-      size="small"
-    >
-      <ChevronRight fontSize="small" />
-    </IconButton>
-  </div>
-);
+      <Select
+        value={date.getFullYear()}
+        onChange={(e) => changeYear(Number(e.target.value))}
+        size="small"
+        variant="outlined"
+        sx={{
+          fontSize: "0.8rem",
+          minWidth: 80,
+          height: 32,
+          ".MuiSelect-select": {
+            padding: "4px 12px",
+          },
+        }}
+      >
+        {years.map((year) => (
+          <MenuItem key={year} value={year}>
+            {year}
+          </MenuItem>
+        ))}
+      </Select>
 
+      <IconButton onClick={increaseMonth} size="small">
+        <ChevronRight fontSize="small" />
+      </IconButton>
+    </div>
+  );
+};
 const CustomDatePicker = ({ value, onChange }) => {
   const theme = useTheme();
 
@@ -138,7 +159,11 @@ const CustomDatePicker = ({ value, onChange }) => {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (calendarRef.current && !calendarRef.current.contains(e.target)) {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(e.target) &&
+        !document.querySelector(".MuiPopover-root")?.contains(e.target) // 👈 ADD THIS
+      ) {
         setIsOpen(false);
       }
     };
@@ -223,6 +248,8 @@ const CustomDatePicker = ({ value, onChange }) => {
           }}
         >
           <DatePicker
+            showYearDropdown
+            dropdownMode="select"
             selected={startDate}
             onChange={handleDateChange}
             startDate={startDate}
@@ -260,24 +287,9 @@ const CustomDatePicker = ({ value, onChange }) => {
                 >
                   {[
                     {
-                      label: "This Week",
+                      label: "Last 7 Days",
                       range: [
-                        new Date(
-                          new Date().setDate(
-                            new Date().getDate() - new Date().getDay()
-                          )
-                        ),
-                        new Date(),
-                      ],
-                    },
-                    {
-                      label: "Since Last Week",
-                      range: [
-                        new Date(
-                          new Date().setDate(
-                            new Date().getDate() - new Date().getDay() - 7
-                          )
-                        ),
+                        new Date(new Date().setDate(new Date().getDate() - 6)),
                         new Date(),
                       ],
                     },
@@ -293,14 +305,18 @@ const CustomDatePicker = ({ value, onChange }) => {
                       ],
                     },
                     {
-                      label: "Since Last Month",
+                      label: "Last Month",
                       range: [
                         new Date(
                           new Date().getFullYear(),
                           new Date().getMonth() - 1,
                           1
                         ),
-                        new Date(),
+                        new Date(
+                          new Date().getFullYear(),
+                          new Date().getMonth(),
+                          0
+                        ),
                       ],
                     },
                     {
@@ -355,10 +371,10 @@ const CustomDatePicker = ({ value, onChange }) => {
                       ],
                     },
                     {
-                      label: "Since Last Year",
+                      label: "Last Year",
                       range: [
                         new Date(new Date().getFullYear() - 1, 0, 1),
-                        new Date(),
+                        new Date(new Date().getFullYear() - 1, 11, 31),
                       ],
                     },
                   ].map((preset) => (

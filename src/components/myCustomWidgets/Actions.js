@@ -81,12 +81,7 @@ const StyledSelect = styled(Select)(({ theme }) => ({
   },
 }));
 
-function Actions({
-  filters,
-  setFilters,
-  facilityOptions = ["All"],
-  stateOptions = ["All"],
-}) {
+function Actions({ filters, setFilters, facilityOptions, stateOptions }) {
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
   const MenuProps = {
@@ -145,7 +140,7 @@ function Actions({
               }
               MenuProps={MenuProps}
             >
-              {["All", ...stateOptions].map((state) => (
+              {["All", ...stateOptions.map((s) => s.state)].map((state) => (
                 <MenuItem key={state} value={state}>
                   {state}
                 </MenuItem>
@@ -193,11 +188,13 @@ function Actions({
               }
               MenuProps={MenuProps}
             >
-              {["All", ...facilityOptions].map((facility) => (
-                <MenuItem key={facility} value={facility}>
-                  {facility}
-                </MenuItem>
-              ))}
+              {["All", ...facilityOptions.map((f) => f["Facility Name"])].map(
+                (facility) => (
+                  <MenuItem key={facility} value={facility}>
+                    {facility}
+                  </MenuItem>
+                )
+              )}
             </StyledSelect>
           </FormControl>
         </Grid>
@@ -237,7 +234,7 @@ function Actions({
             padding: "0 8px",
           })}
         >
-          <Typography sx={{ fontSize: "0.875rem" }}>Status:</Typography>
+          <Typography sx={{ fontSize: "0.875rem" }}>Add Bed Holds:</Typography>
           <StyledCheckboxLabel
             sx={{ ml: 0 }}
             control={

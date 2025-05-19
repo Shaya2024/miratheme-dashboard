@@ -42,52 +42,38 @@ function CensusDashboard() {
   const [facilityOptions, setFacilityOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  console.log(`facilityOptions: ${JSON.stringify(facilityOptions)}`);
+  console.log(`stateOptions: ${JSON.stringify(stateOptions)}`);
+
   const [filters, setFilters] = useState({
-    startDate: thirtyDaysAgo,
+    startDate: today,
     endDate: today,
     state: "All",
     facility: "All",
     residentStatusPaid: 0,
     residentStatusUnpaid: 0,
     payors: [],
-    splitMedicaidPending: 0,
+    splitMedicaidPending: false,
   });
 
   console.log(`filters: ${JSON.stringify(filters)}`);
   // ✅ Shared query string builder
-  const buildQueryString = (selectCommand) => {
-    let localStartDate = filters.startDate;
-    const endDate = filters.endDate;
-
-    // 🧠 Only for censustrend_payorarry, adjust the startDate if same as endDate
-    if (selectCommand === "SELECT * from censustrend_payorarry") {
-      const start = new Date(filters.startDate);
-      const end = new Date(filters.endDate);
-      if (start.toDateString() === end.toDateString()) {
-        const newStart = new Date(end);
-        newStart.setDate(end.getDate() - 30);
-        localStartDate = newStart;
-      }
-    }
-
+  const buildQueryString = (selectCommand, args = {}) => {
     return new URLSearchParams({
-      selectCommand: selectCommand,
-      startDate: formatDate(localStartDate),
-      endDate: formatDate(endDate),
-      facility: filters.facility,
-      residentStatusPaid: filters.residentStatusPaid,
-      residentStatusUnpaid: filters.residentStatusUnpaid,
-      payors: JSON.stringify(filters.payors.length ? filters.payors : ["All"]),
-      splitMedicaidPending: filters.splitMedicaidPending ? "1" : "0",
-      state: filters.state,
+      selectCommand,
+      ...Object.fromEntries(
+        Object.entries(args).map(([key, val]) => [
+          key,
+          key === "payors" ? JSON.stringify(val) : val,
+        ])
+      ),
     }).toString();
   };
 
-  // ✅ Shared fetcher
-  const fetchProcedure = async (selectCommand, setterCallback) => {
+  const fetchProcedure = async (selectCommand, setterCallback, args) => {
     try {
-      const query = buildQueryString(selectCommand);
-      const res = await fetch(`/api/census/getWidgetData?${query}`);
+      const query = buildQueryString(selectCommand, args);
+      const res = await fetch(`/api/census/getWidgetData3?${query}`);
       const data = await res.json();
       setterCallback(data.result);
     } catch (err) {
@@ -95,69 +81,55 @@ function CensusDashboard() {
     }
   };
 
-  // 🧠 Fetch state & facility options — unchanged
   useEffect(() => {
-    fetch(`/api/census/getStates`)
-      .then((res) => res.json())
-      .then((data) => setStateOptions(data.result))
-      .catch((err) => console.error("Failed to load states", err));
-
-    fetch(`/api/census/getFacilities`)
-      .then((res) => res.json())
-      .then((data) => setFacilityOptions(data.result))
-      .catch((err) => console.error("Failed to load facilities", err));
+    fetchProcedure(
+      "SELECT DISTINCT state FROM stern_portfolio_location_info",
+      setStateOptions
+    );
+    fetchProcedure(
+      'SELECT DISTINCT "Facility Name" FROM stern_portfolio_location_info',
+      setFacilityOptions
+    );
   }, []);
 
   // 🧠 Fetch all widget data via shared method
   useEffect(() => {
-    fetchProcedure("SELECT * FROM funccensus_payorarry", (result) =>
-      setAverageCensus(result[0]?.cnt)
+    const toMDY = (d) =>
+      d.toLocaleDateString("en-US", {
+        year: "2-digit",
+        month: "numeric",
+        day: "numeric",
+      });
+
+    const args = {
+      startDate: toMDY(filters.startDate),
+      endDate: toMDY(filters.endDate),
+      facility: filters.facility,
+      residentStatusPaid: filters.residentStatusPaid,
+      residentStatusUnpaid: filters.residentStatusUnpaid,
+      payors: filters.payors.length ? filters.payors : ["All"],
+      splitMedicaidPending: filters.splitMedicaidPending ? "1" : "0",
+      state: filters.state,
+    };
+
+    fetchProcedure(
+      "SELECT * FROM funccensus_payorarry",
+      (result) => setAverageCensus(result[0]?.cnt),
+      args
     );
 
     fetchProcedure(
       "SELECT occupancypct from funcoccupancy_payorarry",
-      (result) => setTotalOccupancy(result[0]?.occupancypct ?? "N/A")
+      (result) => setTotalOccupancy(result[0]?.occupancypct ?? "N/A"),
+      args
     );
 
-    fetchProcedure("SELECT * FROM payorpie_new", setPayorDistribution);
-
-    fetchProcedure("SELECT * from censustrend_payorarry", setTrendData);
-
-    fetchProcedure("SELECT * from bar_census", setBarChartData);
+    fetchProcedure("SELECT * FROM payorpie_new", setPayorDistribution, args);
+    fetchProcedure("SELECT * FROM censustrend_payorarry", setTrendData, args);
+    fetchProcedure("SELECT * from bar_census", setBarChartData, args);
   }, [filters]);
 
   const { t } = useTranslation();
-
-  const mockBarChartData = [
-    {
-      facility: "Gallatine Manor",
-      payors: { "Medicare A": 25, HMO: 45, Medicaid: 10, Private: 5 },
-      totalAverage: 100,
-    },
-    {
-      facility: "Agawam",
-      payors: { "Medicare A": 10, HMO: 20, Medicaid: 5, Private: 10 },
-      totalAverage: 45,
-    },
-    {
-      facility: "Springfield",
-      payors: { "Medicare A": 15, HMO: 30, Medicaid: 10, Private: 5 },
-      totalAverage: 60,
-    },
-  ];
-
-  const mockTrendData = [
-    { Date: "2024-04-01", Count: 1358 },
-    { Date: "2024-04-02", Count: 1348 },
-    { Date: "2024-04-03", Count: 1352 },
-    { Date: "2024-04-04", Count: 1341 },
-    { Date: "2024-04-05", Count: 1347 },
-    { Date: "2024-04-06", Count: 1341 },
-    { Date: "2024-04-07", Count: 1337 },
-    { Date: "2024-04-08", Count: 1341 },
-    { Date: "2024-04-09", Count: 1357 },
-    { Date: "2024-04-10", Count: 1341 },
-  ];
 
   return (
     <React.Fragment>
