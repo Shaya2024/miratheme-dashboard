@@ -26,27 +26,12 @@ const Card = styled(MuiCard)(spacing);
 
 const CardContent = styled(MuiCardContent)(spacing);
 
-const Divider = styled(MuiDivider)(spacing);
-
-const Breadcrumbs = styled(MuiBreadcrumbs)(spacing);
-
 const Paper = styled(MuiPaper)(spacing);
 
-const CustomTableCell = styled(TableCell)`
-  &.${tableCellClasses.head} {
-    background: ${(props) => props.theme.palette.common.black};
-    color: ${(props) => props.theme.palette.common.white};
-  }
-  &.${tableCellClasses.body} {
-    font-size: 14px;
-  }
-`;
-
-const CustomTableRow = styled(TableRow)`
-  &:nth-of-type(odd) {
-    background-color: rgba(0, 0, 0, 0.025);
-  }
-`;
+function formatDate(value) {
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? value : date.toLocaleDateString("en-US");
+}
 
 function CustomSimpleTable({ title, description, headersArray, rows }) {
   const keys =
@@ -68,7 +53,11 @@ function CustomSimpleTable({ title, description, headersArray, rows }) {
             <TableRow>
               {Array.isArray(headersArray) &&
                 headersArray.map((header, index) => (
-                  <TableCell key={index} align={index === 0 ? "left" : "right"}>
+                  <TableCell
+                    key={index}
+                    align={index === 0 ? "left" : "right"}
+                    sx={{ pr: 20 }}
+                  >
                     {header}
                   </TableCell>
                 ))}
@@ -77,13 +66,19 @@ function CustomSimpleTable({ title, description, headersArray, rows }) {
 
           <TableBody>
             {Array.isArray(rows) &&
-              rows.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell component="th" scope="row">
-                    {row[keys[0]]}
-                  </TableCell>
-                  <TableCell align="right">{row[keys[1]]}</TableCell>
-                  <TableCell align="right">{row[keys[2]]}</TableCell>
+              rows.map((row, rowIndex) => (
+                <TableRow key={rowIndex}>
+                  {keys.map((key, colIndex) => (
+                    <TableCell
+                      key={`${rowIndex}-${key}`}
+                      align={colIndex === 0 ? "left" : "right"}
+                      sx={{ pr: 20 }}
+                    >
+                      {key.toLowerCase().includes("date")
+                        ? formatDate(row[key])
+                        : row[key]}
+                    </TableCell>
+                  ))}
                 </TableRow>
               ))}
           </TableBody>
