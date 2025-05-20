@@ -81,11 +81,11 @@ function BarLineComboChart({ theme, barData, lineData, title }) {
         type: "bar",
         label: "Worked",
         data: workedValues,
-        backgroundColor: workedValues.map((val, i) =>
-          parseFloat(val).toFixed(1) < parseFloat(requiredValues[i]).toFixed(1)
-            ? red[500]
-            : green[500]
-        ),
+        backgroundColor: workedValues.map((val, i) => {
+          const worked = parseFloat(val);
+          const required = parseFloat(requiredValues[i]);
+          return worked < required ? red[500] : green[500];
+        }),
       },
     ],
   };

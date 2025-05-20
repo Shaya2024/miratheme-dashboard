@@ -13,6 +13,7 @@ import {
 import Stats from "@/components/myCustomWidgets/Stats";
 import { green, red } from "@mui/material/colors";
 import Loader from "@/components/Loader";
+import CustomDatePickerSingleDay from "@/components/myCustomWidgets/CustomDatePickerSingleDay";
 
 import {
   Button as MuiButton,
@@ -235,7 +236,7 @@ function IlStaffingRequirements() {
         <Grid>
           <Grid container spacing={2}>
             <Grid item>
-              <CustomSingleDatePicker
+              <CustomDatePickerSingleDay
                 value={filters.date}
                 onChange={(date) =>
                   setFilters((prev) => ({
@@ -380,37 +381,33 @@ function IlStaffingRequirements() {
         <Grid item size={{ xs: 6 }}>
           <Stats
             title="TOTAL REQUIRED"
-            amount={query1 === "" ? <Loader /> : query1}
+            amount={query1 === "" ? <Loader /> : Number(query1).toFixed(2)}
             chip="placeholder"
-            percentagetext="+26%"
-            percentagecolor={green[500]}
+            align="center"
           />
         </Grid>
         <Grid item size={{ xs: 6 }}>
           <Stats
             title="TOTAL HOURS WORKED"
-            amount={query2 === "" ? <Loader /> : query2}
+            amount={query2 === "" ? <Loader /> : Number(query2).toFixed(2)}
             chip="placeholder"
-            percentagetext="-14%"
-            percentagecolor={red[500]}
+            align="center"
           />
         </Grid>
         <Grid item size={{ xs: 6 }}>
           <Stats
             title="HOURS EXCEEDING TOTAL STAFFING REQUIREMENT"
-            amount={query1 === "" ? <Loader /> : query2 - query1}
+            amount={query1 === "" ? <Loader /> : (query2 - query1).toFixed(2)}
             chip="placeholder"
-            percentagetext="+26%"
-            percentagecolor={green[500]}
+            align="center"
           />
         </Grid>
         <Grid item size={{ xs: 6 }}>
           <Stats
             title="TOTAL NURSING HOURS WORKED"
-            amount={query3 === "" ? <Loader /> : query3}
+            amount={query3 === "" ? <Loader /> : Number(query3).toFixed(2)}
             chip="placeholder"
-            percentagetext="-14%"
-            percentagecolor={red[500]}
+            align="center"
           />
         </Grid>
         <Grid item size={{ xs: 6 }}>
@@ -420,21 +417,19 @@ function IlStaffingRequirements() {
               query1 === "" || query3 === "" ? (
                 <Loader />
               ) : (
-                query3 - query1 * 0.25
+                (query3 - query1 * 0.25).toFixed(2)
               )
             }
             chip="placeholder"
-            percentagetext="+26%"
-            percentagecolor={green[500]}
+            align="center"
           />
         </Grid>
         <Grid item size={{ xs: 6 }}>
           <Stats
             title="TOTAL RN HOURS WORKED"
-            amount={query4 === "" ? <Loader /> : query4}
+            amount={query4 === "" ? <Loader /> : Number(query4).toFixed(2)}
             chip="placeholder"
-            percentagetext="-14%"
-            percentagecolor={red[500]}
+            align="center"
           />
         </Grid>
         <Grid item size={{ xs: 6 }}>
@@ -444,12 +439,11 @@ function IlStaffingRequirements() {
               query1 === "" || query4 === "" ? (
                 <Loader />
               ) : (
-                query4 - query1 * 0.1
+                (query4 - query1 * 0.1).toFixed(2)
               )
             }
             chip="placeholder"
-            percentagetext="-14%"
-            percentagecolor={red[500]}
+            align="center"
           />
         </Grid>
       </Grid>

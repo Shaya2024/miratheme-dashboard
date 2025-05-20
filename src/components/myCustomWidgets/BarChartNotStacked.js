@@ -64,8 +64,7 @@ function BarChartNotStacked({ theme, dbData, title }) {
           color: theme.palette.text.primary,
           callback: function (value, index) {
             const label = dbData[index]?.facility || value;
-            const total = dbData[index]?.total ?? "";
-            return [`${label}`, `Total: ${total}`];
+            return `${label}`;
           },
         },
         grid: {

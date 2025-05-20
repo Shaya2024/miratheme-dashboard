@@ -224,7 +224,7 @@ function IlStaffingDailyOverview() {
           const q2 = query2.find((q) => q.facility_name === q1.facility_name);
           const rawValue =
             (parseFloat(q2?.hours_worked) || 0) -
-            (parseFloat(q1.sum_total) || 0);
+            (parseFloat(q1?.sum_total) || 0);
 
           return {
             facility: q1.facility_name,
@@ -239,7 +239,7 @@ function IlStaffingDailyOverview() {
           const q3 = query3.find((q) => q.facility_name === q1.facility_name);
           const rawValue =
             (parseFloat(q3?.hours_worked) || 0) -
-            (parseFloat(q1.sum_total) || 0) * 0.1;
+            (parseFloat(q1?.sum_total) || 0) * 0.25;
 
           return {
             facility: q1.facility_name,
@@ -249,12 +249,12 @@ function IlStaffingDailyOverview() {
       : [];
 
   const chart3Data =
-    Array.isArray(query1) && Array.isArray(query3)
+    Array.isArray(query1) && Array.isArray(query4)
       ? query1.map((q1) => {
           const q4 = query4.find((q) => q.facility_name === q1.facility_name);
           const rawValue =
             (parseFloat(q4?.hours_worked) || 0) -
-            (parseFloat(q1.sum_total) || 0) * 0.25;
+            (parseFloat(q1?.sum_total) || 0) * 0.1;
 
           return {
             facility: q1.facility_name,
