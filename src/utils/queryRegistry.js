@@ -148,34 +148,49 @@ export const queryRegistry = {
     sql: (placeholders) =>
       `SELECT * FROM total_rn_hours_worked_page2(${placeholders})`,
   },
+  // IL Staffing Page 3 - Trend
+  "SELECT sum(sum_total) FROM total_hours_page3": {
+    args: ["region", "facility", "startDate", "endDate"],
+    arrayParams: [],
+    sql: (placeholders) =>
+      `SELECT sum(sum_total) FROM total_hours_page3(${placeholders})`,
+  },
 
-  "SELECT * FROM total_hours_date_range": {
-    args: ["region", "facility", "startDate", "endDate"],
-    arrayParams: [],
-    sql: (placeholders) =>
-      `SELECT * FROM total_hours_date_range(${placeholders})`,
-  },
-  "SELECT * FROM total_hours_worked_date_range": {
-    args: ["region", "facility", "startDate", "endDate"],
-    arrayParams: [],
-    sql: (placeholders) =>
-      `SELECT * FROM total_hours_worked_date_range(${placeholders})`,
-  },
-  "SELECT * FROM total_nursing_hours_worked_date_range": {
-    args: ["region", "facility", "startDate", "endDate"],
-    arrayParams: [],
-    sql: (placeholders) =>
-      `SELECT * FROM total_nursing_hours_worked_date_range(${placeholders})`,
-  },
-  "SELECT * FROM total_rn_hours_worked_date_range": {
-    args: ["region", "facility", "startDate", "endDate"],
-    arrayParams: [],
-    sql: (placeholders) =>
-      `SELECT * FROM total_rn_hours_worked_date_range(${placeholders})`,
-  },
-  "SELECT * FROM rn_coverage": {
+  "SELECT datekey, SUM(hours_worked) AS hours_worked FROM total_hours_worked_page3 GROUP BY datekey":
+    {
+      args: ["region", "facility", "startDate", "endDate"],
+      arrayParams: [],
+      sql: (placeholders) =>
+        `SELECT datekey, SUM(hours_worked) AS hours_worked
+     FROM total_hours_worked_page3(${placeholders})
+     GROUP BY datekey
+     ORDER BY datekey`,
+    },
+  "SELECT datekey, SUM(hours_worked) AS hours_worked FROM total_nursing_hours_worked_page3 GROUP BY datekey":
+    {
+      args: ["region", "facility", "startDate", "endDate"],
+      arrayParams: [],
+      sql: (placeholders) =>
+        `SELECT datekey, SUM(hours_worked) AS hours_worked
+     FROM total_nursing_hours_worked_page3(${placeholders})
+     GROUP BY datekey
+     ORDER BY datekey`,
+    },
+  "SELECT datekey, SUM(hours_worked) AS hours_worked FROM total_rn_hours_worked_page3 GROUP BY datekey":
+    {
+      args: ["region", "facility", "startDate", "endDate"],
+      arrayParams: [],
+      sql: (placeholders) =>
+        `SELECT datekey, SUM(hours_worked) AS hours_worked
+     FROM total_rn_hours_worked_page3(${placeholders})
+     GROUP BY datekey
+     ORDER BY datekey`,
+    },
+
+  // IL Staffing Page 4 - RN Coverage
+  "SELECT * FROM rn_coverage_page4": {
     args: ["facility", "startDate", "endDate"],
     arrayParams: [],
-    sql: (placeholders) => `SELECT * FROM rn_coverage(${placeholders})`,
+    sql: (placeholders) => `SELECT * FROM rn_coverage_page4(${placeholders})`,
   },
 };

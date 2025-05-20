@@ -19,7 +19,7 @@ import {
 const pagesSection = [
   {
     href: "/dashboard",
-    icon: Sliders,
+    icon: Layout,
     title: "Census",
     children: [
       {
@@ -57,11 +57,22 @@ const pagesSection = [
         href: "/dashboard/il-staffing/rn-coverage",
         title: "RN Coverage",
       },
-      {
-        href: "/pages/blank",
-        title: "Blank Page",
-      },
     ],
+  },
+  {
+    href: "/dashboard/ma-staffing",
+    icon: Layout,
+    title: "MA Staffing",
+  },
+  {
+    href: "/dashboard/medicare-pdpm",
+    icon: Layout,
+    title: "Medicare PDPM",
+  },
+  {
+    href: "/dashboard/medicaid-pdpm",
+    icon: Layout,
+    title: "Medicaid PDPM",
   },
   {
     href: "/projects",

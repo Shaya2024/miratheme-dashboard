@@ -3,27 +3,81 @@
 import React, { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
+import CustomDatePicker from "@/components/myCustomWidgets/CustomDatePicker";
 import {
-  Grid,
-  Stack,
   Divider as MuiDivider,
   Typography as MuiTypography,
+  Stack,
 } from "@mui/material";
-import { spacing } from "@mui/system";
-import { green, red } from "@mui/material/colors";
 
-import Actions from "@/components/myCustomWidgets/Actions";
-import DoughnutChart from "@/components/myCustomWidgets/DoughnutChart";
-import Stats from "@/components/myCustomWidgets/Stats";
-import BarChartNotStacked from "@/components/myCustomWidgets/BarChartNotStacked";
+import BarLineComboChart from "@/components/myCustomWidgets/BarLineComboChart";
+import { green, red } from "@mui/material/colors";
+import Loader from "@/components/Loader";
+
+import {
+  Button as MuiButton,
+  FormControlLabel,
+  MenuItem,
+  Grid,
+  FormControl as MuiFormControl,
+  Select,
+} from "@mui/material";
+
+import {
+  Loop as LoopIcon,
+  FilterList as FilterListIcon,
+  FileDownload as FileDownloadIcon,
+} from "@mui/icons-material";
+
+import { spacing } from "@mui/system";
 
 const Divider = styled(MuiDivider)(spacing);
 const Typography = styled(MuiTypography)(spacing);
+const FormControlSpacing = styled(MuiFormControl)(spacing);
 
-function IlStaffingDailyOverview() {
+const FormControl = styled(FormControlSpacing)`
+  display: flex;
+  justify-content: center;
+`;
+
+const Button = styled(MuiButton)(spacing);
+
+const SmallButton = styled(Button)`
+  padding: 4px;
+  min-width: 0;
+
+  svg {
+    width: 0.9em;
+    height: 0.9em;
+  }
+`;
+
+const StyledSelect = styled(Select)(({ theme }) => ({
+  backgroundColor: theme.palette.secondary.main,
+  color: "white",
+  borderRadius: 4,
+  height: 36,
+  fontSize: "0.875rem",
+  paddingLeft: 12,
+  paddingRight: 12,
+  display: "flex",
+  alignItems: "center",
+  ".MuiSelect-select": {
+    display: "flex",
+    alignItems: "center",
+    padding: "0 !important",
+    height: "100%",
+  },
+  ".MuiSelect-icon": {
+    color: "white",
+  },
+  "& fieldset": {
+    border: "none",
+  },
+}));
+
+function IlStaffingTrend() {
   const today = new Date();
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(today.getDate() - 30);
 
   const formatDate = (d) =>
     d.toLocaleDateString("en-US", {
@@ -32,131 +86,146 @@ function IlStaffingDailyOverview() {
       day: "2-digit",
     });
 
-  const [averageCensus, setAverageCensus] = useState(null);
-  const [totalOccupancy, setTotalOccupancy] = useState(null);
-  const [payorDistribution, setPayorDistribution] = useState(null);
-  const [trendData, setTrendData] = useState(null);
-  const [barChartData, setBarChartData] = useState(null);
-  const [stateOptions, setStateOptions] = useState([]);
-  const [facilityOptions, setFacilityOptions] = useState([]);
+  const [query5, setQuery5] = useState("");
+  const [query6, setQuery6] = useState("");
+  const [query7, setQuery7] = useState("");
+  const [query8, setQuery8] = useState("");
+  const [regionOptions, setRegionOptions] = useState(["All "]);
+  const [facilityOptions, setFacilityOptions] = useState(["All"]);
   const [loading, setLoading] = useState(false);
+  console.log(`facilityOptions: ${JSON.stringify(facilityOptions)}`);
+
+  console.log(`query5: ${JSON.stringify(query5)}`);
+  console.log(`query6: ${JSON.stringify(query6)}`);
+  console.log(`query7: ${JSON.stringify(query7)}`);
+  console.log(`query8: ${JSON.stringify(query8)}`);
 
   const [filters, setFilters] = useState({
-    startDate: thirtyDaysAgo,
+    startDate: today,
     endDate: today,
-    state: ["All"],
-    facility: ["All"],
-    residentStatusPaid: 0,
-    residentStatusUnpaid: 0,
-    payors: [],
-    splitMedicaidPending: 0,
+    region: "All",
+    facility: "All",
   });
 
-  console.log(`filters: ${JSON.stringify(filters)}`);
   // ✅ Shared query string builder
-  const buildQueryString = (selectCommand) =>
-    new URLSearchParams({
-      selectCommand: selectCommand,
-      startDate: formatDate(filters.startDate),
-      endDate: formatDate(filters.endDate),
-      facility: filters.facility[0] !== "" ? filters.facility : "All",
-      /* If I want to change to multiple, change to facility: filters.facility[0] !== "" ? filters.facility.join(",") : "All", */ residentStatusPaid:
-        filters.residentStatusPaid,
-      residentStatusUnpaid: filters.residentStatusUnpaid,
-      payors: JSON.stringify(filters.payors.length ? filters.payors : ["All"]),
-      splitMedicaidPending: filters.splitMedicaidPending ? "1" : "0",
-      state: filters.state[0] !== "" ? filters.state : "All", // If I want to change to multiple I need to change this to state: filters.state[0] !== "" ? filters.state.join(",") : "All",
+  const buildQueryString = (selectCommand, args = {}) => {
+    return new URLSearchParams({
+      selectCommand,
+      ...Object.fromEntries(
+        Object.entries(args).map(([key, val]) => [
+          key,
+          key === "payors" ? JSON.stringify(val) : val,
+        ])
+      ),
     }).toString();
+  };
 
   // ✅ Shared fetcher
-  const fetchProcedure = async (selectCommand, setterCallback) => {
+  const fetchProcedure = async (selectCommand, handleData, args = {}) => {
     try {
-      const query = buildQueryString(selectCommand);
-      const res = await fetch(`/api/census/getWidgetData?${query}`);
+      const query = buildQueryString(selectCommand, args);
+      const res = await fetch(`/api/census/getWidgetData3?${query}`);
       const data = await res.json();
-      setterCallback(data.result);
+      handleData(data.result); // let the caller decide what to do with result
     } catch (err) {
       console.error(`Failed to load ${selectCommand}`, err);
     }
   };
 
-  // 🧠 Fetch state & facility options — unchanged
-  useEffect(() => {
-    fetch(`/api/census/getStates`)
-      .then((res) => res.json())
-      .then((data) => setStateOptions(data.result))
-      .catch((err) => console.error("Failed to load states", err));
-
-    fetch(`/api/census/getFacilities`)
-      .then((res) => res.json())
-      .then((data) => setFacilityOptions(data.result))
-      .catch((err) => console.error("Failed to load facilities", err));
-  }, []);
-
   // 🧠 Fetch all widget data via shared method
   useEffect(() => {
-    fetchProcedure("SELECT * FROM funccensus_payorarry", (result) =>
-      setAverageCensus(result[0]?.cnt)
+    setLoading(true);
+    const args = {
+      region: filters.region,
+      facility: filters.facility,
+      startDate: formatDate(filters.startDate),
+      endDate: formatDate(filters.endDate),
+    };
+
+    fetchProcedure(
+      "SELECT sum(sum_total) FROM total_hours_page3",
+      (result) => {
+        setQuery5(result);
+      },
+      args
     );
 
-    fetchProcedure("SELECT occupancypct from funcoccupancy", (result) =>
-      setTotalOccupancy(result[0]?.occupancypct ?? "N/A")
+    fetchProcedure(
+      "SELECT datekey, SUM(hours_worked) AS hours_worked FROM total_hours_worked_page3 GROUP BY datekey",
+      (result) => {
+        setQuery6(result);
+      },
+      args
     );
 
-    fetchProcedure("SELECT * FROM payorpie_new", setPayorDistribution);
+    fetchProcedure(
+      "SELECT datekey, SUM(hours_worked) AS hours_worked FROM total_nursing_hours_worked_page3 GROUP BY datekey",
+      (result) => {
+        setQuery7(result);
+      },
+      args
+    );
 
-    fetchProcedure("SELECT * from censustrend", setTrendData);
-
-    {
-      /*fetchProcedure("SELECT * FROM payorcensusbar_new", setBarChartData);*/
-    }
+    fetchProcedure(
+      "SELECT datekey, SUM(hours_worked) AS hours_worked FROM total_rn_hours_worked_page3 GROUP BY datekey",
+      (result) => {
+        setQuery8(result);
+      },
+      args
+    );
   }, [filters]);
+
+  useEffect(() => {
+    fetchProcedure(
+      "SELECT DISTINCT \"Facility_Name\" FROM census_staffing WHERE state = 'IL'",
+      setFacilityOptions
+    );
+
+    fetchProcedure(
+      "SELECT DISTINCT region FROM census_staffing WHERE state = 'IL'",
+      setRegionOptions
+    );
+  }, []);
 
   const { t } = useTranslation();
 
-  const mockBarChartNotStackedData1 = [
-    { facility: "Agawam", value: -3, total: 9 },
-    { facility: "Springfield", value: 5, total: 12 },
-    { facility: "ABC", value: 5, total: 12 },
-    { facility: "Carmi", value: -2 },
-    { facility: "Robinson", value: 2 },
-    { facility: "Gallatin", value: 8 },
-    { facility: "Agawam East", value: -6 },
-    { facility: "Agwam North", value: 4 },
-    { facility: "Agwam Wwest", value: 9 },
-  ];
-  const mockBarChartNotStackedData2 = [
-    { facility: "Agawam", value: -3, total: 9 },
-    { facility: "Springfield", value: 5, total: 12 },
-    { facility: "ABC", value: 5, total: 12 },
-    { facility: "Carmi", value: -2 },
-    { facility: "Robinson", value: 2 },
-    { facility: "Gallatin", value: 8 },
-    { facility: "Agawam East", value: -6 },
-    { facility: "Agwam North", value: 4 },
-    { facility: "Agwam Wwest", value: 9 },
-  ];
-  const mockBarChartNotStackedData3 = [
-    { facility: "Agawam", value: -3, total: 9 },
-    { facility: "Springfield", value: 5, total: 12 },
-    { facility: "ABC", value: 5, total: 12 },
-    { facility: "Carmi", value: -2 },
-    { facility: "Robinson", value: 2 },
-    { facility: "Gallatin", value: 8 },
-    { facility: "Agawam East", value: -6 },
-    { facility: "Agwam North", value: 4 },
-    { facility: "Agwam Wwest", value: 9 },
-  ];
+  const ITEM_HEIGHT = 48;
+  const ITEM_PADDING_TOP = 8;
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250,
+      },
+    },
+  };
+
+  /* For multiselect 
+    const handleChange = (field) => (event) => {
+    const value = event.target.value;
+    setFilters((prev) => ({
+      ...prev,
+      [field]: value.includes("All") ? [] : value,
+    }));
+  };
+  */
+
+  const handleChange = (field) => (event) => {
+    setFilters((prev) => ({
+      ...prev,
+      [field]: event.target.value,
+    }));
+  };
 
   return (
     <React.Fragment>
-      <Grid justifyContent="space-between" container spacing={6}>
+      <Stack justifyContent="space-between" spacing={6}>
         <Grid>
           <Typography variant="h3" gutterBottom>
             IL Staffing Dashboard
           </Typography>
           <Typography variant="h4" gutterBottom>
-            Daily Overview
+            Requirements
           </Typography>
           <Typography variant="subtitle1">
             {t("Welcome back")}, Lucy! {t("We've missed you")}.{" "}
@@ -167,32 +236,168 @@ function IlStaffingDailyOverview() {
         </Grid>
 
         <Grid>
-          <Actions
-            filters={filters}
-            setFilters={setFilters}
-            stateOptions={stateOptions}
-            facilityOptions={facilityOptions}
-          />
+          <Grid container spacing={2}>
+            <Grid item>
+              <CustomDatePicker
+                value={{
+                  startDate: filters.startDate,
+                  endDate: filters.endDate,
+                }}
+                onChange={({ startDate, endDate }) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    startDate,
+                    endDate,
+                  }))
+                }
+              />
+            </Grid>
+
+            {/* This is for MultiSelect 
+                    <Grid item>
+                      <FormControl sx={{ minWidth: 148 }}>
+                        <StyledSelect
+                          multiple
+                          displayEmpty
+                          value={filters.state}
+                          onChange={handleChange("state")}
+                          renderValue={(selected) =>
+                            selected.length > 0 ? selected.join(", ") : "State"
+                          }
+                          MenuProps={MenuProps}
+                        >
+                          {stateOptions.map((state) => (
+                            <MenuItem key={state} value={state}>
+                              <Checkbox checked={filters.state.includes(state)} />
+                              <ListItemText primary={state} />
+                            </MenuItem>
+                          ))}
+                        </StyledSelect>
+                      </FormControl>
+                    </Grid>
+                    */}
+
+            <Grid item>
+              <FormControl sx={{ minWidth: 130 }}>
+                <StyledSelect
+                  displayEmpty
+                  value={filters.region}
+                  onChange={handleChange("region")}
+                  renderValue={(selected) =>
+                    !selected || selected === "All"
+                      ? "Region"
+                      : selected.length > 3
+                      ? selected.slice(0, 9) + "…"
+                      : selected
+                  }
+                  MenuProps={MenuProps}
+                >
+                  {[
+                    "All",
+                    ...(Array.isArray(regionOptions) && regionOptions[0]?.region
+                      ? regionOptions.map((r) => r.region)
+                      : []),
+                  ].map((region) => (
+                    <MenuItem key={region} value={region}>
+                      {region}
+                    </MenuItem>
+                  ))}
+                </StyledSelect>
+              </FormControl>
+            </Grid>
+
+            {/* This is for MultiSelect 
+                    <Grid item>
+                      <FormControl sx={{ minWidth: 148 }}>
+                        <StyledSelect
+                          multiple
+                          displayEmpty
+                          value={filters.facility}
+                          onChange={handleChange("facility")}
+                          renderValue={(selected) =>
+                            selected.length > 0 ? selected.join(", ") : "Facility"
+                          }
+                          MenuProps={MenuProps}
+                        >
+                          {facilityOptions.map((facility) => (
+                            <MenuItem key={facility} value={facility}>
+                              <Checkbox checked={filters.facility.includes(facility)} />
+                              <ListItemText primary={facility} />
+                            </MenuItem>
+                          ))}
+                        </StyledSelect>
+                      </FormControl>
+                    </Grid>
+                    */}
+
+            <Grid item>
+              <FormControl sx={{ minWidth: 130 }}>
+                <StyledSelect
+                  displayEmpty
+                  value={filters.facility}
+                  onChange={handleChange("facility")}
+                  renderValue={(selected) =>
+                    !selected || selected === "All"
+                      ? "Facility"
+                      : selected.length > 3
+                      ? selected.slice(0, 9) + "…"
+                      : selected
+                  }
+                  MenuProps={MenuProps}
+                >
+                  {[
+                    "All",
+                    ...(Array.isArray(facilityOptions) &&
+                    facilityOptions[0]?.Facility_Name
+                      ? facilityOptions.map((f) => f.Facility_Name)
+                      : []),
+                  ].map((facility) => (
+                    <MenuItem key={facility} value={facility}>
+                      {facility}
+                    </MenuItem>
+                  ))}
+                </StyledSelect>
+              </FormControl>
+            </Grid>
+
+            <Grid item>
+              <SmallButton size="small" mr={2}>
+                <FileDownloadIcon />
+              </SmallButton>
+            </Grid>
+
+            <Grid item>
+              <SmallButton size="small" mr={2}>
+                <FilterListIcon />
+              </SmallButton>
+            </Grid>
+
+            <Grid item>
+              <SmallButton size="small" mr={2}>
+                <LoopIcon />
+              </SmallButton>
+            </Grid>
+          </Grid>
         </Grid>
-      </Grid>
+      </Stack>
 
       <Divider my={3} />
 
-      <BarChartNotStacked
-        dbData={mockBarChartNotStackedData1}
+      <BarLineComboChart
+        barData={query6}
+        lineData={query5}
         title="Total Hours"
       />
-      <BarChartNotStacked
-        dbData={mockBarChartNotStackedData2}
-        title="Nursing Hours
-"
+
+      <BarLineComboChart
+        barData={query7}
+        lineData={query5}
+        title="Nursing Hours"
       />
-      <BarChartNotStacked
-        dbData={mockBarChartNotStackedData3}
-        title="RN Hours"
-      />
+
+      <BarLineComboChart barData={query8} lineData={query5} title="RN Hours" />
     </React.Fragment>
   );
 }
 
-export default IlStaffingDailyOverview;
+export default IlStaffingTrend;

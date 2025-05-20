@@ -398,7 +398,7 @@ function IlStaffingRequirements() {
         <Grid item size={{ xs: 6 }}>
           <Stats
             title="HOURS EXCEEDING TOTAL STAFFING REQUIREMENT"
-            amount={query1 === "" ? <Loader /> : query1 - query2}
+            amount={query1 === "" ? <Loader /> : query2 - query1}
             chip="placeholder"
             percentagetext="+26%"
             percentagecolor={green[500]}
@@ -417,7 +417,11 @@ function IlStaffingRequirements() {
           <Stats
             title="HOURS EXCEEDING NURSING REQUIREMENT"
             amount={
-              query1 === "" || query3 === "" ? <Loader /> : query1 - query3
+              query1 === "" || query3 === "" ? (
+                <Loader />
+              ) : (
+                query3 - query1 * 0.25
+              )
             }
             chip="placeholder"
             percentagetext="+26%"
@@ -437,7 +441,11 @@ function IlStaffingRequirements() {
           <Stats
             title="HOURS EXCEEDING RN REQUIREMENT"
             amount={
-              query1 === "" || query4 === "" ? <Loader /> : query1 - query4
+              query1 === "" || query4 === "" ? (
+                <Loader />
+              ) : (
+                query4 - query1 * 0.1
+              )
             }
             chip="placeholder"
             percentagetext="-14%"
