@@ -149,12 +149,27 @@ export const queryRegistry = {
       `SELECT * FROM total_rn_hours_worked_page2(${placeholders})`,
   },
   // IL Staffing Page 3 - Trend
-  "SELECT sum(sum_total) FROM total_hours_page3": {
-    args: ["region", "facility", "startDate", "endDate"],
-    arrayParams: [],
-    sql: (placeholders) =>
-      `SELECT sum(sum_total) FROM total_hours_page3(${placeholders})`,
-  },
+  "SELECT datekey,SUM(sum_total) as sum_total FROM total_hours_page3 GROUP BY datekey":
+    {
+      args: ["region", "facility", "startDate", "endDate"],
+      arrayParams: [],
+      sql: (placeholders) =>
+        `SELECT datekey,SUM(sum_total) as sum_total FROM total_hours_page3(${placeholders}) GROUP BY datekey`,
+    },
+  "SELECT datekey,SUM(sum_total) as sum_total FROM total_nursing_hours_page3 GROUP BY datekey":
+    {
+      args: ["region", "facility", "startDate", "endDate"],
+      arrayParams: [],
+      sql: (placeholders) =>
+        `SELECT datekey,SUM(sum_total) as sum_total FROM total_nursing_hours_page3(${placeholders}) GROUP BY datekey`,
+    },
+  "SELECT datekey,SUM(sum_total) as sum_total FROM total_rn_hours_page3 GROUP BY datekey":
+    {
+      args: ["region", "facility", "startDate", "endDate"],
+      arrayParams: [],
+      sql: (placeholders) =>
+        `SELECT datekey,SUM(sum_total) as sum_total FROM total_rn_hours_page3(${placeholders}) GROUP BY datekey`,
+    },
 
   "SELECT datekey, SUM(hours_worked) AS hours_worked FROM total_hours_worked_page3 GROUP BY datekey":
     {
@@ -193,4 +208,21 @@ export const queryRegistry = {
     arrayParams: [],
     sql: (placeholders) => `SELECT * FROM rn_coverage_page4(${placeholders})`,
   },
+
+  // MA Staffing
+  "SELECT facility_name,total_per_q FROM ma_staffing WHERE quarter = 'Q1_2025'":
+    {
+      args: [],
+      arrayParams: [],
+      sql: () =>
+        `SELECT facility_name,total_per_q FROM ma_staffing WHERE quarter = 'Q1_2025'`,
+    },
+
+  "SELECT facility_name,total_per_q FROM ma_staffing WHERE quarter = 'Q2_2025'":
+    {
+      args: [],
+      arrayParams: [],
+      sql: () =>
+        `SELECT facility_name,total_per_q FROM ma_staffing WHERE quarter = 'Q2_2025'`,
+    },
 };

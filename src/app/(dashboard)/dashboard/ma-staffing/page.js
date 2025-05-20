@@ -86,24 +86,16 @@ function IlStaffingTrend() {
       day: "2-digit",
     });
 
-  const [query5a, setQuery5a] = useState("");
-  const [query5b, setQuery5b] = useState("");
-  const [query5c, setQuery5c] = useState("");
+  const [queryQ1, setQueryQ1] = useState("");
+  const [queryQ2, setQueryQ2] = useState("");
 
-  const [query6, setQuery6] = useState("");
-  const [query7, setQuery7] = useState("");
-  const [query8, setQuery8] = useState("");
   const [regionOptions, setRegionOptions] = useState(["All "]);
   const [facilityOptions, setFacilityOptions] = useState(["All"]);
   const [loading, setLoading] = useState(false);
   console.log(`facilityOptions: ${JSON.stringify(facilityOptions)}`);
 
-  console.log(`query5a: ${JSON.stringify(query5a)}`);
-  console.log(`query5b: ${JSON.stringify(query5b)}`);
-  console.log(`query5c: ${JSON.stringify(query5c)}`);
-  console.log(`query6: ${JSON.stringify(query6)}`);
-  console.log(`query7: ${JSON.stringify(query7)}`);
-  console.log(`query8: ${JSON.stringify(query8)}`);
+  console.log(`queryQ1: ${JSON.stringify(queryQ1)}`);
+  console.log(`queryQ2: ${JSON.stringify(queryQ2)}`);
 
   const [filters, setFilters] = useState({
     startDate: today,
@@ -148,47 +140,17 @@ function IlStaffingTrend() {
     };
 
     fetchProcedure(
-      "SELECT datekey,SUM(sum_total) as sum_total FROM total_hours_page3 GROUP BY datekey",
+      "SELECT facility_name,total_per_q FROM ma_staffing WHERE quarter = 'Q1_2025'",
       (result) => {
-        setQuery5a(result);
-      },
-      args
-    );
-    fetchProcedure(
-      "SELECT datekey,SUM(sum_total) as sum_total FROM total_nursing_hours_page3 GROUP BY datekey",
-      (result) => {
-        setQuery5b(result);
-      },
-      args
-    );
-    fetchProcedure(
-      "SELECT datekey,SUM(sum_total) as sum_total FROM total_rn_hours_page3 GROUP BY datekey",
-      (result) => {
-        setQuery5c(result);
+        setQueryQ1(result);
       },
       args
     );
 
     fetchProcedure(
-      "SELECT datekey, SUM(hours_worked) AS hours_worked FROM total_hours_worked_page3 GROUP BY datekey",
+      "SELECT facility_name,total_per_q FROM ma_staffing WHERE quarter = 'Q2_2025'",
       (result) => {
-        setQuery6(result);
-      },
-      args
-    );
-
-    fetchProcedure(
-      "SELECT datekey, SUM(hours_worked) AS hours_worked FROM total_nursing_hours_worked_page3 GROUP BY datekey",
-      (result) => {
-        setQuery7(result);
-      },
-      args
-    );
-
-    fetchProcedure(
-      "SELECT datekey, SUM(hours_worked) AS hours_worked FROM total_rn_hours_worked_page3 GROUP BY datekey",
-      (result) => {
-        setQuery8(result);
+        setQueryQ2(result);
       },
       args
     );
@@ -401,20 +363,6 @@ function IlStaffingTrend() {
       </Stack>
 
       <Divider my={3} />
-
-      <BarLineComboChart
-        barData={query6}
-        lineData={query5a}
-        title="Total Hours"
-      />
-
-      <BarLineComboChart
-        barData={query7}
-        lineData={query5b}
-        title="Nursing Hours"
-      />
-
-      <BarLineComboChart barData={query8} lineData={query5c} title="RN Hours" />
     </React.Fragment>
   );
 }
