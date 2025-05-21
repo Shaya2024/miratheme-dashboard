@@ -204,10 +204,10 @@ function IlStaffingTrend() {
       <Stack justifyContent="space-between" spacing={6}>
         <Grid>
           <Typography variant="h3" gutterBottom>
-            IL Staffing Dashboard
+            MA Staffing Dashboard
           </Typography>
           <Typography variant="h4" gutterBottom>
-            Requirements
+            Overview
           </Typography>
           <Typography variant="subtitle1">
             {t("Welcome back")}, Lucy! {t("We've missed you")}.{" "}

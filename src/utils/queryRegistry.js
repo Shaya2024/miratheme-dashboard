@@ -209,7 +209,14 @@ export const queryRegistry = {
     sql: (placeholders) => `SELECT * FROM rn_coverage_page4(${placeholders})`,
   },
 
-  // MA Staffing
+  // MA Staffing Page 1 - Overview
+  "SELECT DISTINCT \"Facility_Name\" FROM census_staffing WHERE state = 'MA'": {
+    args: [],
+    arrayParams: [],
+    sql: () =>
+      "SELECT DISTINCT \"Facility_Name\" FROM census_staffing WHERE state = 'MA'",
+  },
+
   "SELECT facility_name,total_per_q FROM ma_staffing WHERE quarter = 'Q1_2025'":
     {
       args: [],
@@ -225,4 +232,30 @@ export const queryRegistry = {
       sql: () =>
         `SELECT facility_name,total_per_q FROM ma_staffing WHERE quarter = 'Q2_2025'`,
     },
+
+  // MA Staffing Page 2 - Requirements
+  "SELECT * FROM ma_last_q": {
+    args: ["facility"],
+    arrayParams: [],
+    sql: (placeholders) => `SELECT * FROM ma_last_q(${placeholders})`,
+  },
+
+  "SELECT * FROM ma_current_q": {
+    args: ["facility"],
+    arrayParams: [],
+    sql: (placeholders) => `SELECT * FROM ma_current_q(${placeholders})`,
+  },
+
+  "SELECT * FROM ma_current_q_30days": {
+    args: ["facility"],
+    arrayParams: [],
+    sql: (placeholders) => `SELECT * FROM ma_current_q_30days(${placeholders})`,
+  },
+
+  // MA Staffing Page 3 - RN Coverage
+  "SELECT * FROM ma_rn_coverage": {
+    args: ["facility", "startDate", "endDate"],
+    arrayParams: [],
+    sql: (placeholders) => `SELECT * FROM ma_rn_coverage(${placeholders})`,
+  },
 };

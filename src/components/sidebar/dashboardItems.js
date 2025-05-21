@@ -60,9 +60,23 @@ const pagesSection = [
     ],
   },
   {
-    href: "/dashboard/ma-staffing",
+    href: "/dashboard",
     icon: Layout,
     title: "MA Staffing",
+    children: [
+      {
+        href: "/dashboard/ma-staffing/overview",
+        title: "Overview",
+      },
+      {
+        href: "/dashboard/ma-staffing/requirements",
+        title: "Requirements",
+      },
+      {
+        href: "/dashboard/ma-staffing/rn-coverage",
+        title: "RN Coverage",
+      },
+    ],
   },
   {
     href: "/dashboard/medicare-pdpm",
