@@ -8,9 +8,10 @@ import {
   Divider as MuiDivider,
   Typography as MuiTypography,
   Stack,
+  Box,
 } from "@mui/material";
 
-import BarLineComboChart from "@/components/myCustomWidgets/BarLineComboChart";
+import ThresholdBarChart from "@/components/myCustomWidgets/ThresholdBarChart";
 import { green, red } from "@mui/material/colors";
 import Loader from "@/components/Loader";
 
@@ -219,129 +220,6 @@ function IlStaffingTrend() {
         <Grid>
           <Grid container spacing={2}>
             <Grid item>
-              <CustomDatePicker
-                value={{
-                  startDate: filters.startDate,
-                  endDate: filters.endDate,
-                }}
-                onChange={({ startDate, endDate }) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    startDate,
-                    endDate,
-                  }))
-                }
-              />
-            </Grid>
-
-            {/* This is for MultiSelect 
-                    <Grid item>
-                      <FormControl sx={{ minWidth: 148 }}>
-                        <StyledSelect
-                          multiple
-                          displayEmpty
-                          value={filters.state}
-                          onChange={handleChange("state")}
-                          renderValue={(selected) =>
-                            selected.length > 0 ? selected.join(", ") : "State"
-                          }
-                          MenuProps={MenuProps}
-                        >
-                          {stateOptions.map((state) => (
-                            <MenuItem key={state} value={state}>
-                              <Checkbox checked={filters.state.includes(state)} />
-                              <ListItemText primary={state} />
-                            </MenuItem>
-                          ))}
-                        </StyledSelect>
-                      </FormControl>
-                    </Grid>
-                    */}
-
-            <Grid item>
-              <FormControl sx={{ minWidth: 130 }}>
-                <StyledSelect
-                  displayEmpty
-                  value={filters.region}
-                  onChange={handleChange("region")}
-                  renderValue={(selected) =>
-                    !selected || selected === "All"
-                      ? "Region"
-                      : selected.length > 3
-                      ? selected.slice(0, 9) + "…"
-                      : selected
-                  }
-                  MenuProps={MenuProps}
-                >
-                  {[
-                    "All",
-                    ...(Array.isArray(regionOptions) && regionOptions[0]?.region
-                      ? regionOptions.map((r) => r.region)
-                      : []),
-                  ].map((region) => (
-                    <MenuItem key={region} value={region}>
-                      {region}
-                    </MenuItem>
-                  ))}
-                </StyledSelect>
-              </FormControl>
-            </Grid>
-
-            {/* This is for MultiSelect 
-                    <Grid item>
-                      <FormControl sx={{ minWidth: 148 }}>
-                        <StyledSelect
-                          multiple
-                          displayEmpty
-                          value={filters.facility}
-                          onChange={handleChange("facility")}
-                          renderValue={(selected) =>
-                            selected.length > 0 ? selected.join(", ") : "Facility"
-                          }
-                          MenuProps={MenuProps}
-                        >
-                          {facilityOptions.map((facility) => (
-                            <MenuItem key={facility} value={facility}>
-                              <Checkbox checked={filters.facility.includes(facility)} />
-                              <ListItemText primary={facility} />
-                            </MenuItem>
-                          ))}
-                        </StyledSelect>
-                      </FormControl>
-                    </Grid>
-                    */}
-
-            <Grid item>
-              <FormControl sx={{ minWidth: 130 }}>
-                <StyledSelect
-                  displayEmpty
-                  value={filters.facility}
-                  onChange={handleChange("facility")}
-                  renderValue={(selected) =>
-                    !selected || selected === "All"
-                      ? "Facility"
-                      : selected.length > 3
-                      ? selected.slice(0, 9) + "…"
-                      : selected
-                  }
-                  MenuProps={MenuProps}
-                >
-                  {[
-                    "All",
-                    ...(Array.isArray(facilityOptions) &&
-                    facilityOptions[0]?.Facility_Name
-                      ? facilityOptions.map((f) => f.Facility_Name)
-                      : []),
-                  ].map((facility) => (
-                    <MenuItem key={facility} value={facility}>
-                      {facility}
-                    </MenuItem>
-                  ))}
-                </StyledSelect>
-              </FormControl>
-            </Grid>
-
-            <Grid item>
               <SmallButton size="small" mr={2}>
                 <FileDownloadIcon />
               </SmallButton>
@@ -363,6 +241,21 @@ function IlStaffingTrend() {
       </Stack>
 
       <Divider my={3} />
+      <Box display="flex" justifyContent="center" mt={2}>
+        <ThresholdBarChart
+          data={queryQ1}
+          nameKey="facility_name"
+          valueKey="total_per_q"
+        />
+      </Box>
+
+      <Box display="flex" justifyContent="center" mt={2}>
+        <ThresholdBarChart
+          data={queryQ2}
+          nameKey="facility_name"
+          valueKey="total_per_q"
+        />
+      </Box>
     </React.Fragment>
   );
 }
