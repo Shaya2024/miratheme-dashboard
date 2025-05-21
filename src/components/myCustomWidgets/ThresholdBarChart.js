@@ -18,8 +18,8 @@ const ThresholdBarChart = ({ data, nameKey, valueKey, threshold = 3.6 }) => {
               <Tooltip placement="right" title={`${facility} - ${value}`}>
                 <Box
                   sx={{
-                    height: 40,
-                    width: 300,
+                    height: 20,
+                    width: 50,
                     bgcolor: barColor,
                     ml: 2,
                     borderRadius: 0,

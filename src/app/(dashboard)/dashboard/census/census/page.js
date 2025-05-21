@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
+import useAuth from "@/hooks/useAuth";
 import {
   Grid,
   Stack,
@@ -22,6 +23,9 @@ const Divider = styled(MuiDivider)(spacing);
 const Typography = styled(MuiTypography)(spacing);
 
 function CensusDashboard() {
+  const { user } = useAuth();
+  const fullName = user?.displayName || "User";
+  const firstName = fullName.split(" ")[0];
   const today = new Date();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(today.getDate() - 30);
@@ -43,7 +47,7 @@ function CensusDashboard() {
   const [loading, setLoading] = useState(false);
 
   console.log(`facilityOptions: ${JSON.stringify(facilityOptions)}`);
-  console.log(`stateOptions: ${JSON.stringify(stateOptions)}`);
+  console.log(`barChartData: ${JSON.stringify(barChartData)}`);
 
   const [filters, setFilters] = useState({
     startDate: today,
@@ -143,7 +147,7 @@ function CensusDashboard() {
           </Typography>
 
           <Typography variant="subtitle1">
-            {t("Welcome back")}, Lucy! {t("We've missed you")}.{" "}
+            {t("Welcome back")}, {firstName}! {t("We've missed you")}.{" "}
             <span role="img" aria-label="Waving Hand Sign">
               👋
             </span>

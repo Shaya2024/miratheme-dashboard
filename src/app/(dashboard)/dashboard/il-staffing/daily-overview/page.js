@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
-import CustomSingleDatePicker from "@/components/myCustomWidgets/CustomSingleDatePicker";
+import CustomDatePickerSingleDay from "@/components/myCustomWidgets/CustomDatePickerSingleDay";
 import {
   Divider as MuiDivider,
   Typography as MuiTypography,
@@ -172,12 +172,12 @@ function IlStaffingDailyOverview() {
 
   useEffect(() => {
     fetchProcedure(
-      "SELECT DISTINCT \"Facility_Name\" FROM census_staffing WHERE state = 'IL'",
+      "SELECT DISTINCT \"Facility_Name\" FROM pointclickcare.census_staffing WHERE state = 'IL'",
       setFacilityOptions
     );
 
     fetchProcedure(
-      "SELECT DISTINCT region FROM census_staffing WHERE state = 'IL'",
+      "SELECT DISTINCT region FROM pointclickcare.census_staffing WHERE state = 'IL'",
       setRegionOptions
     );
   }, []);
@@ -312,7 +312,7 @@ function IlStaffingDailyOverview() {
         <Grid>
           <Grid container spacing={2}>
             <Grid item>
-              <CustomSingleDatePicker
+              <CustomDatePickerSingleDay
                 value={filters.date}
                 onChange={(date) =>
                   setFilters((prev) => ({

@@ -241,21 +241,29 @@ function IlStaffingTrend() {
       </Stack>
 
       <Divider my={3} />
-      <Box display="flex" justifyContent="center" mt={2}>
-        <ThresholdBarChart
-          data={queryQ1}
-          nameKey="facility_name"
-          valueKey="total_per_q"
-        />
-      </Box>
+      <Grid container spacing={3}>
+        <Grid item size={{ xs: 6, lg: 6 }}>
+          <Box display="flex" justifyContent="center" mt={2}>
+            <ThresholdBarChart
+              title="Q1 2025"
+              data={queryQ1}
+              nameKey="facility_name"
+              valueKey="total_per_q"
+            />
+          </Box>
+        </Grid>
 
-      <Box display="flex" justifyContent="center" mt={2}>
-        <ThresholdBarChart
-          data={queryQ2}
-          nameKey="facility_name"
-          valueKey="total_per_q"
-        />
-      </Box>
+        <Grid item size={{ xs: 6, lg: 6 }}>
+          <Box display="flex" justifyContent="center" mt={2}>
+            <ThresholdBarChart
+              title="Q2 2025"
+              data={queryQ2}
+              nameKey="facility_name"
+              valueKey="total_per_q"
+            />
+          </Box>
+        </Grid>
+      </Grid>
     </React.Fragment>
   );
 }

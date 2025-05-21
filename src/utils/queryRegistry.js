@@ -87,18 +87,21 @@ export const queryRegistry = {
   },
 
   //  Filters IL Staffing
-  "SELECT DISTINCT \"Facility_Name\" FROM census_staffing WHERE state = 'IL'": {
-    args: [],
-    arrayParams: [],
-    sql: () =>
-      "SELECT DISTINCT \"Facility_Name\" FROM census_staffing WHERE state = 'IL'",
-  },
+  "SELECT DISTINCT \"Facility_Name\" FROM pointclickcare.census_staffing WHERE state = 'IL'":
+    {
+      args: [],
+      arrayParams: [],
+      sql: () =>
+        "SELECT DISTINCT \"Facility_Name\" FROM pointclickcare.census_staffing WHERE state = 'IL'",
+    },
 
-  "SELECT DISTINCT region FROM census_staffing WHERE state = 'IL'": {
-    args: [],
-    arrayParams: [],
-    sql: () => "SELECT DISTINCT region FROM census_staffing WHERE state = 'IL'",
-  },
+  "SELECT DISTINCT region FROM pointclickcare.census_staffing WHERE state = 'IL'":
+    {
+      args: [],
+      arrayParams: [],
+      sql: () =>
+        "SELECT DISTINCT region FROM pointclickcare.census_staffing WHERE state = 'IL'",
+    },
 
   // IL Staffing Page 1 - Daily Overview
   "SELECT * FROM total_hours_page1": {
@@ -125,11 +128,28 @@ export const queryRegistry = {
       `SELECT * FROM total_rn_hours_worked_page1(${placeholders})`,
   },
   // IL Staffing Page 2 - Requirements
-  "SELECT * FROM total_hours_page2": {
+  // Hours required
+  "SELECT sum_total FROM total_hours_page2_all": {
     args: ["facility", "date"],
     arrayParams: [],
-    sql: (placeholders) => `SELECT * FROM total_hours_page2(${placeholders})`,
+    sql: (placeholders) =>
+      `SELECT sum_total FROM total_hours_page2_all(${placeholders})`,
   },
+
+  "SELECT nursing_hours FROM total_hours_page2_all": {
+    args: ["facility", "date"],
+    arrayParams: [],
+    sql: (placeholders) =>
+      `SELECT nursing_hours FROM total_hours_page2_all(${placeholders})`,
+  },
+
+  "SELECT rn_hours FROM total_hours_page2_all": {
+    args: ["facility", "date"],
+    arrayParams: [],
+    sql: (placeholders) =>
+      `SELECT rn_hours FROM total_hours_page2_all(${placeholders})`,
+  },
+  //Hours worked
   "SELECT * FROM total_hours_worked_page2": {
     args: ["facility", "date"],
     arrayParams: [],
@@ -149,6 +169,7 @@ export const queryRegistry = {
       `SELECT * FROM total_rn_hours_worked_page2(${placeholders})`,
   },
   // IL Staffing Page 3 - Trend
+  //5a
   "SELECT datekey,SUM(sum_total) as sum_total FROM total_hours_page3 GROUP BY datekey":
     {
       args: ["region", "facility", "startDate", "endDate"],
@@ -156,6 +177,7 @@ export const queryRegistry = {
       sql: (placeholders) =>
         `SELECT datekey,SUM(sum_total) as sum_total FROM total_hours_page3(${placeholders}) GROUP BY datekey`,
     },
+  //5b
   "SELECT datekey,SUM(sum_total) as sum_total FROM total_nursing_hours_page3 GROUP BY datekey":
     {
       args: ["region", "facility", "startDate", "endDate"],
@@ -163,6 +185,7 @@ export const queryRegistry = {
       sql: (placeholders) =>
         `SELECT datekey,SUM(sum_total) as sum_total FROM total_nursing_hours_page3(${placeholders}) GROUP BY datekey`,
     },
+  //5c
   "SELECT datekey,SUM(sum_total) as sum_total FROM total_rn_hours_page3 GROUP BY datekey":
     {
       args: ["region", "facility", "startDate", "endDate"],
@@ -170,7 +193,7 @@ export const queryRegistry = {
       sql: (placeholders) =>
         `SELECT datekey,SUM(sum_total) as sum_total FROM total_rn_hours_page3(${placeholders}) GROUP BY datekey`,
     },
-
+  // 6
   "SELECT datekey, SUM(hours_worked) AS hours_worked FROM total_hours_worked_page3 GROUP BY datekey":
     {
       args: ["region", "facility", "startDate", "endDate"],
@@ -181,6 +204,7 @@ export const queryRegistry = {
      GROUP BY datekey
      ORDER BY datekey`,
     },
+  // 7
   "SELECT datekey, SUM(hours_worked) AS hours_worked FROM total_nursing_hours_worked_page3 GROUP BY datekey":
     {
       args: ["region", "facility", "startDate", "endDate"],
@@ -191,6 +215,7 @@ export const queryRegistry = {
      GROUP BY datekey
      ORDER BY datekey`,
     },
+  //8
   "SELECT datekey, SUM(hours_worked) AS hours_worked FROM total_rn_hours_worked_page3 GROUP BY datekey":
     {
       args: ["region", "facility", "startDate", "endDate"],

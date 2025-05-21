@@ -9,12 +9,12 @@ export const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-export const auth0Config = {
+/* export const auth0Config = {
   clientId: process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID,
   domain: process.env.NEXT_PUBLIC_AUTH0_DOMAIN,
-};
+};*/
 
-export const cognitoConfig = {
+/* export const cognitoConfig = {
   userPoolId: process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID,
   clientId: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID,
-};
+};*/
