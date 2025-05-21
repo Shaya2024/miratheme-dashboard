@@ -19,7 +19,7 @@ const ThresholdBarChart = ({ data, nameKey, valueKey, threshold = 3.6 }) => {
                 <Box
                   sx={{
                     height: 40,
-                    width: 200,
+                    width: 300,
                     bgcolor: barColor,
                     ml: 2,
                     borderRadius: 0,
