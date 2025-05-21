@@ -151,10 +151,9 @@ function Introduction() {
             }}
           >
             <Content>
-              <Version variant="body2">v6.0.0</Version>
+              {/*<Version variant="body2">v6.0.0</Version>*/}
               <Title variant="h1" gutterBottom>
-                The simplest and fastest way to build your next <span>MUI</span>{" "}
-                dashboard or app.
+                Data-Driven Care for a Healthier Tomorrow
               </Title>
               <Grid container justifyContent="center" spacing={4}>
                 <Grid
@@ -164,24 +163,38 @@ function Introduction() {
                   }}
                 >
                   <Subtitle color="textSecondary">
-                    Mira comes with hundreds of UI elements, forms, tables,
-                    charts, pages and icons that helps you to create your web
-                    apps or applications faster.
+                    Real-time analytics powered by AI — designed exclusively for
+                    nursing homes to improve outcomes, streamline operations,
+                    and ensure compliance.
                   </Subtitle>
                 </Grid>
               </Grid>
-              <Box my={6}>
-                <Button
-                  href="#demos"
-                  variant="contained"
-                  color="secondary"
-                  size="large"
-                >
-                  <Visibility />
-                  Live Demo
-                  <ArrowForward />
-                </Button>
-              </Box>
+              <Grid container justifyContent="center" spacing={4}>
+                <Box my={6}>
+                  <Button
+                    href="#demos"
+                    variant="contained"
+                    color="secondary"
+                    size="large"
+                  >
+                    <Visibility />
+                    Request a Demo
+                    <ArrowForward />
+                  </Button>
+                </Box>
+                <Box my={6}>
+                  <Button
+                    href="#demos"
+                    variant="contained"
+                    color="secondary"
+                    size="large"
+                  >
+                    <Visibility />
+                    See Dashboard
+                    <ArrowForward />
+                  </Button>
+                </Box>
+              </Grid>
 
               <Typography variant="body2" color="textSecondary">
                 Available for:

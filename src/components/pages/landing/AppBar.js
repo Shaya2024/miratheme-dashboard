@@ -80,10 +80,10 @@ const AppBarComponent = () => (
                 ml={2}
                 color="primary"
                 variant="contained"
-                href="https://mui.com/store/items/mira-pro-react-material-admin-dashboard/"
-                target="_blank"
+                component={Link}
+                href="/auth/sign-in"
               >
-                Buy Now
+                Sign In
               </Button>
             </Grid>
           </Grid>

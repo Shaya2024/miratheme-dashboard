@@ -8,11 +8,12 @@ import { spacing } from "@mui/system";
 import { ArrowForward as ArrowForwardIcon } from "@mui/icons-material";
 
 import {
-  Mail as MailIcon,
   Code as CodeIcon,
-  Users as UsersIcon,
-  BookOpen as BookOpenIcon,
-  PlusCircle as PlusCircleIcon,
+  HeartPulse as HeartPulseIcon,
+  Gauge as GaugeIcon,
+  DollarSign as DollarSignIcon,
+  ShieldCheck as ShieldCheckIcon,
+  Building2 as Building2Icon,
 } from "lucide-react";
 
 import FigmaIcon from "@/vendor/figma.svg";
@@ -84,7 +85,7 @@ function Features() {
     <Wrapper py={20}>
       <Container>
         <TypographyOverline variant="body2" gutterBottom>
-          Features
+          Solutions
         </TypographyOverline>
         <Typography variant="h2" component="h3" gutterBottom>
           Developers love Mira Pro
@@ -92,34 +93,64 @@ function Features() {
         <Box mb={8} />
         <Grid container spacing={6}>
           <Feature
-            Icon={CodeIcon}
-            title="Modern Technology Stack"
-            description="Mira is built to make your life easier. Theme provider, build tooling, documentation, and 400+ components. "
+            Icon={HeartPulseIcon}
+            title="Clinical Intelligence"
+            description={
+              <ul style={{ margin: 0, paddingLeft: "20px" }}>
+                <li>Monitor vitals, medication adherence, and wound care</li>
+                <li>Predict falls, infections, and clinical decline with AI</li>
+                <li>Automate care plan alerts and nursing follow-ups</li>
+              </ul>
+            }
           />
           <Feature
-            Icon={PlusCircleIcon}
-            title="Multiple Plugins"
-            description="Various third-party plugins are fully integrated, like Chart.js, FullCalendar, WYSIWYG Editors, Formik and Yup."
+            Icon={GaugeIcon}
+            title="Operational Performance"
+            description={
+              <ul style={{ margin: 0, paddingLeft: "20px" }}>
+                <li>Optimize staffing and reduce overtime</li>
+                <li>Monitor census, turnover, and service quality</li>
+                <li>AI detects inefficiencies and suggests improvements</li>
+              </ul>
+            }
           />
+
           <Feature
-            Icon={MailIcon}
-            title="Dev-to-Dev Support"
-            description="Our themes are supported by specialists who provide quick and effective support. Usually an email reply takes <24h."
+            Icon={DollarSignIcon}
+            title="Financial Optimization"
+            description={
+              <ul style={{ margin: 0, paddingLeft: "20px" }}>
+                <li>Identify missed billing opportunities</li>
+                <li>Forecast budgets using AI-powered financial modeling</li>
+                <li>Spot payer delays and reimbursement issues instantly</li>
+              </ul>
+            }
           />
+
           <Feature
-            Icon={UsersIcon}
-            title="Authentication Examples"
-            description="The package comes with fully working authentication examples, including Firebase, Auth0, AWS Cognito and JWT."
+            Icon={ShieldCheckIcon}
+            title="Compliance Monitoring"
+            description={
+              <ul style={{ margin: 0, paddingLeft: "20px" }}>
+                <li>Real-time alerts for documentation gaps</li>
+                <li>Track incidents, infection control, and audit-readiness</li>
+                <li>AI flags patterns before they become violations</li>
+              </ul>
+            }
           />
+
           <Feature
-            Icon={BookOpenIcon}
-            title="Detailed Documentation"
-            description="We've written extensive documentation for the plugins and tools we're using, varying from Redux to ESLint."
-          />
-          <Feature
-            Icon={FigmaIcon}
-            title="Figma Assets"
-            description="Designers, we've got you covered. Figma files are available in the Standard Plus and Extended License."
+            Icon={Building2Icon}
+            title="Multi-Facility Oversight"
+            description={
+              <ul style={{ margin: 0, paddingLeft: "20px" }}>
+                <li>Centralize insights across multiple sites</li>
+                <li>Benchmark KPIs and drill down to the resident level</li>
+                <li>
+                  Use AI to surface anomalies and standardize best practices
+                </li>
+              </ul>
+            }
           />
         </Grid>
 

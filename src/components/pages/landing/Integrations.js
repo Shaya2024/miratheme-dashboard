@@ -42,87 +42,33 @@ function Integrations() {
           Integrations
         </TypographyOverline>
         <Typography variant="h2" component="h3" gutterBottom>
-          Launch faster with ready-to-deploy integrations
+          We use so far: Pointclickcare, Webclock. When2Work, NCS
         </Typography>
 
         <Box my={7}>
-          <Tooltip title="MUI v7">
+          <Tooltip title="Point Click Care">
             <Brand>
               <BrandIcon
                 alt="MUI"
-                src="/static/img/brands/material-ui.svg"
+                src="/static/img/brands/PointClickCare.png"
                 style={{ height: "34px", margin: "3px 0" }}
               />
             </Brand>
           </Tooltip>
-          <Tooltip title="Next.js v15">
+          <Tooltip title="WebClock">
             <Brand>
               <BrandIcon
                 alt="Next.js"
-                src="/static/img/brands/nextjs.svg"
+                src="/static/img/brands/WebClock.png"
                 style={{ height: "40px" }}
               />
             </Brand>
           </Tooltip>
-          <Tooltip title="React v19">
+          <Tooltip title="WhenToWork">
             <Brand>
               <BrandIcon
                 alt="React"
-                src="/static/img/brands/react.svg"
-                style={{ height: "40px" }}
-              />
-            </Brand>
-          </Tooltip>
-          <Tooltip title="Redux">
-            <Brand>
-              <BrandIcon
-                alt="Redux"
-                src="/static/img/brands/redux.svg"
-                style={{ height: "36px", margin: "2px 0" }}
-              />
-            </Brand>
-          </Tooltip>
-          <Tooltip title="Firebase Authentication">
-            <Brand>
-              <BrandIcon
-                alt="Firebase Authentication"
-                src="/static/img/brands/firebase.svg"
-                style={{ height: "40px" }}
-              />
-            </Brand>
-          </Tooltip>
-          <Tooltip title="Amazon Cognito">
-            <Brand>
-              <BrandIcon
-                alt="Amazon Cognito"
-                src="/static/img/brands/cognito.svg"
-                style={{ height: "40px" }}
-              />
-            </Brand>
-          </Tooltip>
-          <Tooltip title="Auth0">
-            <Brand>
-              <BrandIcon
-                alt="Auth0"
-                src="/static/img/brands/auth0.svg"
-                style={{ height: "40px" }}
-              />
-            </Brand>
-          </Tooltip>
-          <Tooltip title="JSON Web Token">
-            <Brand>
-              <BrandIcon
-                alt="JWT"
-                src="/static/img/brands/jwt.svg"
-                style={{ height: "40px" }}
-              />
-            </Brand>
-          </Tooltip>
-          <Tooltip title="ESLint">
-            <Brand>
-              <BrandIcon
-                alt="eslint "
-                src="/static/img/brands/eslint.svg"
+                src="/static/img/brands/WhenToWork.png"
                 style={{ height: "40px" }}
               />
             </Brand>
