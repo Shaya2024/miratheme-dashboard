@@ -270,7 +270,7 @@ function IlStaffingRequirements() {
       <Divider my={3} />
 
       <Grid container spacing={3}>
-        <Grid item size={{ xs: 6 }}>
+        <Grid item size={{ xs: 4, lg: 4 }}>
           <Stats
             title="LAST Q (Q1-2025)"
             amount={
@@ -280,7 +280,7 @@ function IlStaffingRequirements() {
             align="center"
           />
         </Grid>
-        <Grid item size={{ xs: 6 }}>
+        <Grid item size={{ xs: 4, lg: 4 }}>
           <Stats
             title="CURRENT Q (Q2-2025)"
             amount={
@@ -294,7 +294,7 @@ function IlStaffingRequirements() {
             align="center"
           />
         </Grid>
-        <Grid item size={{ xs: 6 }}>
+        <Grid item size={{ xs: 4, lg: 4 }}>
           <Stats
             title="CURRENT Q (Q2-2025)"
             amount={
