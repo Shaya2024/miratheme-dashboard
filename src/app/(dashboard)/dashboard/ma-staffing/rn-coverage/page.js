@@ -11,12 +11,10 @@ import {
 } from "@mui/material";
 
 import CustomSimpleTable from "@/components/myCustomWidgets/CustomSimpleTable";
-import { green, red } from "@mui/material/colors";
 import Loader from "@/components/Loader";
 
 import {
   Button as MuiButton,
-  FormControlLabel,
   MenuItem,
   Grid,
   FormControl as MuiFormControl,
@@ -191,7 +189,7 @@ function IlStaffingRnCoverage() {
       <Stack justifyContent="space-between" spacing={6}>
         <Grid>
           <Typography variant="h3" gutterBottom>
-            IL Staffing Dashboard
+            MA Staffing Dashboard
           </Typography>
           <Typography variant="h4" gutterBottom>
             RN Coverage
