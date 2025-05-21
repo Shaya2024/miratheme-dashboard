@@ -34,7 +34,6 @@ import { spacing } from "@mui/system";
 const Divider = styled(MuiDivider)(spacing);
 const Typography = styled(MuiTypography)(spacing);
 const FormControlSpacing = styled(MuiFormControl)(spacing);
-
 const FormControl = styled(FormControlSpacing)`
   display: flex;
   justify-content: center;
@@ -137,7 +136,7 @@ function IlStaffingRnCoverage() {
     };
 
     fetchProcedure(
-      "SELECT * FROM rn_coverage_page4",
+      "SELECT * FROM ma_rn_coverage",
       (result) => {
         setQuery(result);
       },
@@ -147,12 +146,12 @@ function IlStaffingRnCoverage() {
 
   useEffect(() => {
     fetchProcedure(
-      "SELECT DISTINCT \"Facility_Name\" FROM census_staffing WHERE state = 'IL'",
+      "SELECT DISTINCT \"Facility_Name\" FROM census_staffing WHERE state = 'MA'",
       setFacilityOptions
     );
 
     fetchProcedure(
-      "SELECT DISTINCT region FROM census_staffing WHERE state = 'IL'",
+      "SELECT DISTINCT region FROM census_staffing WHERE state = 'MA'",
       setRegionOptions
     );
   }, []);
@@ -195,7 +194,7 @@ function IlStaffingRnCoverage() {
             IL Staffing Dashboard
           </Typography>
           <Typography variant="h4" gutterBottom>
-            Requirements
+            RN Coverage
           </Typography>
           <Typography variant="subtitle1">
             {t("Welcome back")}, Lucy! {t("We've missed you")}.{" "}
